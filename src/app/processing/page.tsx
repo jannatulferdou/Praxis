@@ -99,7 +99,7 @@ export default function ProcessingPage() {
             <Icon name="business-svgrepo-com" size={40} color="#3A7D44" />
           </div>
           <h1 className="text-2xl font-bold text-white dark:text-gray-100 mb-1">Processing Your Video</h1>
-          <p className="text-sm text-[#344E41]/8000 dark:text-gray-300">We're analyzing your skills and preparing your profile</p>
+          <p className="text-sm text-[#344E41]/8000 dark:text-gray-300">We&apos;re analyzing your skills and preparing your profile</p>
         </div>
 
         {/* Processing Card */}
