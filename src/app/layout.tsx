@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-[#F7F9F4] text-[#344E41] dark:bg-gray-900 dark:text-gray-100 transition-colors">
+      <body className="bg-[#F7F9F4] text-[#344E41] dark:bg-gray-900 dark:text-gray-100 transition-colors" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AppProvider>
             <div className="min-h-screen relative flex flex-col">

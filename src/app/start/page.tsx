@@ -220,7 +220,7 @@ export default function StartPage() {
                 >
                   <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <Icon name="earth-svgrepo-com" size={20} color="white" />
-                  <span className="relative">Begin Recording</span>
+                  <span className="relative">Upload</span>
                 </button>
 
                 {isAdmin && (
@@ -229,7 +229,7 @@ export default function StartPage() {
                     className="group w-full border-2 border-[#A3B18A] hover:border-[#3A7D44] text-[#344E41] font-bold py-3 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-sm hover:bg-[#3A7D44]/5"
                   >
                     <Icon name="business-svgrepo-com" size={20} color="white" />
-                    Admin Dashboard
+                    <span className="relative">Dashboard</span>
                   </button>
                 )}
               </div>
@@ -238,7 +238,7 @@ export default function StartPage() {
               <div className="grid grid-cols-3 gap-3 pt-6 border-t border-[#A3B18A]00/50">
                 {[
                   { label: "Skills", value: "AI-Verified", icon: "check-circle-svgrepo-com", color: "#10B981" },
-                  { label: "Time", value: "30 Seconds", icon: "7x24h-svgrepo-com", color: "#F59E0B" },
+                  { label: "Time", value: "30 Seconds", icon: "movie-svgrepo-com", color: "#F59E0B" },
                   { label: "Jobs", value: "Instant Match", icon: "trending-up-svgrepo-com", color: "#8B5CF6" }
                 ].map((stat, i) => (
                   <div
