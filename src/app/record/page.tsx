@@ -2,90 +2,36 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { Alert } from "@/components/ui/Alert";
 import { Icon } from "@/components/Icon";
-import { BANGLA_TEXT } from "@/constants/bangla";
-import { formatDuration, validateVideoBlob, compressVideoBlob } from "@/utils/video";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { validateVideoBlob, compressVideoBlob } from "@/utils/video";
 import { apiService } from "@/services/api";
+
+const MAX_DURATION_MS = 30000;
+
+const formatDuration = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
+const formatSize = (bytes: number) => {
+  if (!bytes) return "0 MB";
+  const mb = bytes / (1024 * 1024);
+  return `${mb.toFixed(mb >= 10 ? 0 : 1)} MB`;
+};
 
 export default function RecordPage() {
   const router = useRouter();
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const [isRecording, setIsRecording] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
-  const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+  const [selectedBlob, setSelectedBlob] = useState<Blob | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [durationMs, setDurationMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "compressing" | "success">("idle");
-  const [cameraActive, setCameraActive] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "compressing" | "uploading" | "success">("idle");
   const [userId, setUserId] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
-
-  const MAX_DURATION = 30000; // 30 seconds in ms
-  const durationInterval = useRef<NodeJS.Timeout | null>(null);
-
-  /**
-   * Initialize camera access
-   */
-  const initCamera = async () => {
-    try {
-      setError(null);
-      
-      // Check if navigator.mediaDevices exists (client-side only)
-      if (typeof navigator === "undefined" || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setError("Camera API not available. Try a different browser.");
-        setCameraActive(false);
-        return;
-      }
-      
-      // Try with minimal constraints first
-      const constraints = {
-        video: {
-          facingMode: "user",
-        },
-        audio: true,
-      };
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      setCameraActive(true);
-    } catch (err: any) {
-      console.error("Camera error:", err.name, err.message);
-      
-      let errorMsg = "Unable to access camera. Check permissions.";
-      
-      if (err.name === "NotAllowedError") {
-        errorMsg = "Camera permission denied. Go to Settings > Permissions and allow camera access, then refresh.";
-      } else if (err.name === "NotFoundError") {
-        errorMsg = "No camera found on this device.";
-      } else if (err.name === "NotReadableError") {
-        errorMsg = "Camera is in use by another app. Close other apps and try again.";
-      } else if (err.name === "OverconstrainedError") {
-        errorMsg = "Camera constraints not supported on this device.";
-      } else if (err.name === "TypeError") {
-        errorMsg = "Camera API not available. Try Chrome or Firefox.";
-      }
-      
-      setError(errorMsg);
-      setCameraActive(false);
-    }
-  };
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    // Ensure this only runs on client
-    if (typeof window === "undefined") {
-      return;
-    }
-
     const id = localStorage.getItem("userId");
     if (!id) {
       router.push("/login");
@@ -93,110 +39,112 @@ export default function RecordPage() {
     }
     setUserId(id);
 
-    // Auto-initialize camera on desktop only (larger screens)
-    if (window.innerWidth >= 768) {
-      initCamera();
-    }
-
     return () => {
-      if (videoRef.current?.srcObject) {
-        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-        tracks.forEach((track) => track.stop());
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
       }
     };
-  }, [router]);
+  }, [router, previewUrl]);
 
-  /**
-   * Start recording
-   */
-  const startRecording = async () => {
-    if (!videoRef.current?.srcObject) return;
+  const openFilePicker = () => fileInputRef.current?.click();
 
-    try {
-      chunksRef.current = [];
-      const stream = videoRef.current.srcObject as MediaStream;
-      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
-        ? "video/webm;codecs=vp8,opus"
-        : "video/webm";
+  const clearSelection = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedBlob(null);
+    setPreviewUrl(null);
+    setSelectedFileName(null);
+    setDurationMs(0);
+    setUploadProgress(0);
+    setUploadStatus("idle");
+  };
 
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
+  const extractDuration = (url: string) =>
+    new Promise<number>((resolve, reject) => {
+      const probe = document.createElement("video");
+      probe.preload = "metadata";
+      probe.src = url;
+      probe.onloadedmetadata = () => {
+        const ms = probe.duration * 1000;
+        if (!Number.isFinite(ms) || ms <= 0) {
+          reject(new Error("Unable to read video length."));
+          return;
         }
+        if (ms > MAX_DURATION_MS) {
+          reject(new Error("Clip must be 30 seconds or shorter."));
+          return;
+        }
+        resolve(ms);
       };
+      probe.onerror = () => reject(new Error("Unable to load video metadata."));
+    });
 
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: mimeType });
-        setRecordedBlob(blob);
-        const url = URL.createObjectURL(blob);
-        setRecordedUrl(url);
-      };
+  const processFile = async (file: File) => {
+    if (!file.type.startsWith("video")) {
+      throw new Error("Please choose a video file.");
+    }
 
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
-      setIsRecording(true);
-      setDuration(0);
-
-      // Timer
-      durationInterval.current = setInterval(() => {
-        setDuration((prev) => {
-          const newDuration = prev + 100;
-          if (newDuration >= MAX_DURATION) {
-            if (mediaRecorderRef.current && isRecording) {
-              mediaRecorderRef.current.stop();
-              setIsRecording(false);
-            }
-            if (durationInterval.current) {
-              clearInterval(durationInterval.current);
-            }
-            return MAX_DURATION;
-          }
-          return newDuration;
-        });
-      }, 100);
-
+    const tempUrl = URL.createObjectURL(file);
+    try {
+      const ms = await extractDuration(tempUrl);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setSelectedBlob(file);
+      setPreviewUrl(tempUrl);
+      setSelectedFileName(file.name);
+      setDurationMs(ms);
       setError(null);
     } catch (err) {
-      setError("রেকর্ডিং শুরু করতে সমস্যা হয়েছে");
+      URL.revokeObjectURL(tempUrl);
+      throw err;
     }
   };
 
-  /**
-   * Stop recording
-   */
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-
-      if (durationInterval.current) {
-        clearInterval(durationInterval.current);
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        await processFile(file);
+      } catch (err: any) {
+        setError(err?.message || "Invalid video file.");
+        clearSelection();
       }
     }
+    event.target.value = "";
   };
 
-  /**
-   * Retake video
-   */
-  const handleRetake = () => {
-    setRecordedBlob(null);
-    setRecordedUrl(null);
-    setDuration(0);
-    if (recordedUrl) {
-      URL.revokeObjectURL(recordedUrl);
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+    try {
+      await processFile(file);
+    } catch (err: any) {
+      setError(err?.message || "Invalid video file.");
+      clearSelection();
     }
   };
 
-  /**
-   * Upload video
-   */
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (!isDragging) setIsDragging(true);
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+  };
+
   const handleUpload = async () => {
-    if (!recordedBlob || !userId) {
-      setError("ভিডিও পাওয়া যায়নি");
+    if (!selectedBlob || !userId) {
+      setError("Please select a verified clip first.");
       return;
     }
+
+    let progressInterval: number | undefined;
 
     try {
       setLoading(true);
@@ -204,46 +152,44 @@ export default function RecordPage() {
       setUploadProgress(0);
       setUploadStatus("compressing");
 
-      // Validate
-      const validation = validateVideoBlob(recordedBlob);
+      const validation = validateVideoBlob(selectedBlob);
       if (!validation.valid) {
-        setError(validation.error || "ভিডিও বৈধ নয়");
+        setError(validation.error || "Video does not meet requirements.");
         setUploadStatus("idle");
         return;
       }
 
-      // Compress (0-40% progress)
-      setUploadProgress(10);
-      const compressedBlob = await compressVideoBlob(recordedBlob);
+      setUploadProgress(15);
+      const compressedBlob = await compressVideoBlob(selectedBlob);
       setUploadProgress(40);
 
-      // Upload (40-90% progress)
       setUploadStatus("uploading");
-      setUploadProgress(50);
-      
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
+      setUploadProgress(55);
+      progressInterval = window.setInterval(() => {
         setUploadProgress((prev) => {
-          const next = prev + Math.random() * 20;
-          return next > 85 ? 85 : next;
+          const next = prev + Math.random() * 15;
+          return next >= 90 ? 90 : next;
         });
-      }, 500);
+      }, 450);
 
       const response = await apiService.uploadVideo(compressedBlob, userId);
-      clearInterval(progressInterval);
+      if (progressInterval) {
+        window.clearInterval(progressInterval);
+      }
       setUploadProgress(100);
       setUploadStatus("success");
 
       if (response.processing_id) {
         localStorage.setItem("processingId", response.processing_id);
-        
-        // Show success for 1.5s then redirect
         setTimeout(() => {
           router.push("/processing");
         }, 1500);
       }
     } catch (err: any) {
-      setError(err.message || "আপলোড ব্যর্থ হয়েছে");
+      if (progressInterval) {
+        window.clearInterval(progressInterval);
+      }
+      setError(err?.message || "Upload failed. Please retry.");
       setUploadStatus("idle");
       setUploadProgress(0);
     } finally {
@@ -253,207 +199,210 @@ export default function RecordPage() {
 
   if (!userId) {
     return (
-      <div className="min-h-screen bg-[#F7F9F4] flex items-center justify-center px-4">
-        <p className="text-[#344E41]/6000">Loading...</p>
+      <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 flex items-center justify-center px-4">
+        <p className="text-[#344E41] dark:text-gray-300">Loading...</p>
       </div>
     );
   }
 
+  const dropZoneClasses = `rounded-2xl border-2 border-dashed transition-colors duration-200 p-6 sm:p-10 bg-white/80 dark:bg-gray-800/60 ${
+    isDragging ? "border-[#3A7D44] bg-[#3A7D44]/5" : "border-[#A3B18A]/60"
+  }`;
+
   return (
-    <div className="min-h-screen bg-[#F7F9F4] overflow-hidden relative px-4 py-3">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+    <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 relative overflow-hidden px-4 py-6">
+      <div className="absolute inset-0 pointer-events-none opacity-60">
+        <div className="absolute inset-0" style={{
+          backgroundImage:
+            "radial-gradient(circle at 20% 20%, rgba(58,125,68,0.08), transparent 60%), radial-gradient(circle at 80% 0%, rgba(163,177,138,0.15), transparent 45%)"
+        }} />
       </div>
 
-      {/* Grid background pattern */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{
-        backgroundImage: "linear-gradient(0deg, transparent 24%, rgba(58, 125, 68, 0.05) 25%, rgba(58, 125, 68, 0.05) 26%, transparent 27%, transparent 74%, rgba(58, 125, 68, 0.05) 75%, rgba(58, 125, 68, 0.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(58, 125, 68, 0.05) 25%, rgba(58, 125, 68, 0.05) 26%, transparent 27%, transparent 74%, rgba(58, 125, 68, 0.05) 75%, rgba(58, 125, 68, 0.05) 76%, transparent 77%, transparent)",
-        backgroundSize: "50px 50px"
-      }} />
-
-      <div className="relative max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-4">
-          <button
-            onClick={() => router.back()}
-            className="text-[#3A7D44]00 hover:text-[#3A7D44]00 font-semibold mb-3 text-sm"
-          >
-            ← Back
-          </button>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">
-            Record Video
-          </h1>
+      <div className="relative max-w-3xl mx-auto">
+        <div className="absolute top-0 right-0">
+          <ThemeToggle />
         </div>
 
-        {/* Error Alert */}
+        <button
+          onClick={() => router.back()}
+          className="inline-flex items-center text-sm font-semibold text-[#3A7D44] dark:text-blue-300 hover:underline mb-6"
+        >
+          ← Back
+        </button>
+
+        <div className="space-y-2 mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#1F2A1C] dark:text-white">
+            Upload your 30 second pitch
+          </h1>
+          <p className="text-sm sm:text-base text-[#4A5F43] dark:text-gray-300 max-w-2xl">
+            Drop a short video that highlights your skills or story. We automatically optimize and compress it before submitting to the review team.
+          </p>
+        </div>
+
         {error && (
-          <div className="mb-4 bg-red-500/20 border border-red-500/50 rounded-lg p-4">
-            <div className="flex gap-3 mb-2">
-              <Icon name="warning-circle-svgrepo-com" size={20} color="#EF4444" className="flex-shrink-0" />
-              <p className="text-red-300 text-sm font-semibold">{error}</p>
+          <div className="mb-6 rounded-xl border border-red-400/40 bg-red-500/15 p-4 text-sm text-red-800 dark:text-red-200">
+            <div className="flex items-center gap-2 font-semibold">
+              <Icon name="warning-circle-svgrepo-com" size={18} color="#DC2626" />
+              <span>{error}</span>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => initCamera()}
-                className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded font-semibold"
-              >
-                Try Again
-              </button>
-              <button
-                onClick={() => setError(null)}
-                className="text-xs px-3 py-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded font-semibold border border-red-500/50"
-              >
-                Dismiss
-              </button>
-            </div>
+            <button
+              onClick={() => setError(null)}
+              className="mt-2 text-xs font-semibold underline underline-offset-2"
+            >
+              Dismiss
+            </button>
           </div>
         )}
 
-        {/* Mobile Camera Button */}
-        {!cameraActive && typeof window !== "undefined" && window.innerWidth < 768 && (
-          <button
-            onClick={() => {
-              setError(null);
-              initCamera();
-            }}
-            className="w-full mb-4 px-6 py-4 bg-gradient-to-r from-[#3A7D44] to-[#2D5F34] hover:from-[#2D5F34] hover:to-[#25492A] text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
-          >
-            <Icon name="earth-svgrepo-com" size={20} color="white" />
-            Enable Camera
-          </button>
-        )}
+        <div className="space-y-6">
+          <section className="bg-white/80 dark:bg-gray-900/60 border border-[#A3B18A]/50 dark:border-gray-700 rounded-3xl shadow-lg shadow-[#3A7D44]/5 p-6 sm:p-8">
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="rounded-2xl border border-[#D6E2C0] dark:border-gray-700 p-4 bg-[#F9FBF3] dark:bg-gray-800">
+                <p className="text-xs uppercase tracking-wide text-[#567152] dark:text-gray-400 mb-3 font-semibold">Upload checklist</p>
+                <ul className="space-y-2 text-sm text-[#2F3D2D] dark:text-gray-200">
+                  <li>• Keep it under 30 seconds</li>
+                  <li>• Use landscape orientation for best framing</li>
+                  <li>• Stand near a quiet, well-lit space</li>
+                  <li>• Introduce yourself and mention one highlight</li>
+                </ul>
+              </div>
 
-        {/* Main Content */}
-        <div className="bg-white/50 backdrop-blur-xl border border-[#A3B18A]00/50 space-y-4 rounded-xl p-4">
-          {/* Video */}
-          <div className="bg-black rounded-lg overflow-hidden aspect-video flex items-center justify-center">
-            {!cameraActive && (
-              <p className="text-white text-sm">Camera not active</p>
-            )}
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              playsInline
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          </div>
-
-          {/* Timer */}
-          <div className="text-center py-4 bg-[#A3B18A]/10 border border-[#A3B18A]00/50 rounded-lg">
-            <p className="text-4xl font-bold text-[#3A7D44]00">
-              {Math.floor(duration / 1000)}
-            </p>
-            <p className="text-xs text-[#344E41]/6000 mt-1">seconds / 30 max</p>
-          </div>
-
-          {/* Controls */}
-          <div className="space-y-2">
-            {!isRecording ? (
-              <button
-                onClick={startRecording}
-                disabled={!cameraActive || !!recordedBlob || loading}
-                className="w-full px-6 py-3 bg-gradient-to-r from-[#3A7D44] to-[#2D5F34] hover:from-[#2D5F34] hover:to-[#25492A] disabled:from-slate-500 disabled:to-slate-500 text-white font-bold rounded-xl transition-all"
+              <div
+                className={dropZoneClasses}
+                onClick={openFilePicker}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
               >
-                Start
-              </button>
-            ) : (
-              <button
-                onClick={stopRecording}
-                disabled={loading}
-                className="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold rounded-xl transition-all"
-              >
-                Stop
-              </button>
-            )}
-
-            {recordedBlob && (
-              <>
-                {/* Upload Progress */}
-                {uploadStatus !== "idle" && (
-                  <div className="space-y-3 p-4 bg-white/50 border border-[#A3B18A]00/50 rounded-lg">
-                    <div className="flex items-center gap-3 mb-3">
-                      {uploadStatus === "success" ? (
-                        <>
-                          <Icon name="check-circle-svgrepo-com" size={24} color="#16A34A" />
-                          <span className="font-semibold text-green-700">Upload Complete!</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg className="w-5 h-5 animate-spin text-[#3A7D44]600" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          <span className="font-semibold text-slate-700">
-                            {uploadStatus === "compressing" ? "Compressing..." : "Uploading..."}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="w-full bg-slate-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          uploadStatus === "success" ? "bg-green-500" : "bg-[#3A7D44]500"
-                        }`}
-                        style={{ width: `${uploadProgress}%` }}
+                {previewUrl ? (
+                  <div className="space-y-3">
+                    <div className="rounded-xl overflow-hidden aspect-video bg-black">
+                      <video
+                        src={previewUrl}
+                        controls
+                        className="w-full h-full object-cover"
                       />
                     </div>
-                    
-                    {/* Progress Text */}
-                    <div className="flex justify-between items-center text-xs text-slate-600">
-                      <span>{uploadStatus === "compressing" ? "Optimizing video..." : "Transferring..."}</span>
-                      <span className="font-semibold">{Math.round(uploadProgress)}%</span>
+                    <p className="text-xs text-center text-[#294027] dark:text-gray-200">
+                      {selectedFileName} · {formatDuration(durationMs)} · {formatSize(selectedBlob?.size ?? 0)}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-center space-y-4">
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#E3EED4] dark:bg-gray-700">
+                      <Icon name="upload-svgrepo-com" size={24} color="#3A7D44" />
                     </div>
+                    <div>
+                      <p className="font-semibold text-[#1F2A1C] dark:text-white">Drag & drop your video</p>
+                      <p className="text-sm text-[#4F6148] dark:text-gray-300">or click to browse local files</p>
+                    </div>
+                    <p className="text-xs text-[#6B7E66] dark:text-gray-400">
+                      Accepted formats: MP4, MOV, WEBM — 200MB max
+                    </p>
                   </div>
                 )}
+              </div>
+            </div>
 
+            <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-[#E1EBD2] dark:border-gray-700/80 bg-white/70 dark:bg-gray-800/60 px-4 py-3">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-[#6E8A68] dark:text-gray-400 font-semibold">Clip status</p>
+                <p className="text-sm font-semibold text-[#1F2A1C] dark:text-white">
+                  {selectedFileName ? "Ready for optimization" : "No clip selected yet"}
+                </p>
+                {selectedFileName ? (
+                  <p className="text-xs text-[#4A5F43] dark:text-gray-300 mt-1">
+                    {selectedFileName} · {formatDuration(durationMs)} · {formatSize(selectedBlob?.size ?? 0)}
+                  </p>
+                ) : (
+                  <p className="text-xs text-[#4A5F43] dark:text-gray-300 mt-1">
+                    Upload a clean take under 30 seconds.
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-2">
                 <button
-                  onClick={handleRetake}
-                  disabled={isRecording || loading}
-                  className="w-full px-6 py-3 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 text-slate-900 font-semibold rounded-lg transition-colors"
+                  onClick={clearSelection}
+                  disabled={!selectedBlob || loading}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold border border-[#D1DBC0] dark:border-gray-600 text-[#364831] dark:text-gray-200 disabled:opacity-40"
                 >
-                  Retake
+                  Clear
                 </button>
+                <button
+                  onClick={openFilePicker}
+                  disabled={loading}
+                  className="px-5 py-2 rounded-lg text-sm font-semibold bg-[#3A7D44] text-white hover:bg-[#2C5A34] disabled:bg-[#3A7D44]/40"
+                >
+                  Browse files
+                </button>
+              </div>
+            </div>
+          </section>
 
+          {selectedBlob && (
+            <section className="bg-white/70 dark:bg-gray-900/60 border border-[#DDE8CF] dark:border-gray-700 rounded-3xl p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-[#6E8A68] dark:text-gray-400 font-semibold">Optimization</p>
+                  <p className="text-sm text-[#1F2A1C] dark:text-white max-w-xl">
+                    We validate the codec, trim background noise, and compress the file so reviewers can stream it immediately after upload.
+                  </p>
+                </div>
                 <button
                   onClick={handleUpload}
-                  disabled={isRecording || loading}
-                  className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                  disabled={loading || uploadStatus === "success"}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#3A7D44] to-[#2E5C35] hover:from-[#335F3A] hover:to-[#23472A] disabled:bg-slate-400"
                 >
-                  {loading && uploadStatus === "idle" ? (
+                  {loading ? (
                     <>
-                      <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
-                      Preparing...
+                      Optimizing
                     </>
                   ) : (
                     <>
                       <Icon name="upload-svgrepo-com" size={18} color="white" />
-                      Upload
+                      Send clip
                     </>
                   )}
                 </button>
-              </>
-            )}
-          </div>
+              </div>
 
-          {/* Preview */}
-          {recordedUrl && (
-            <div className="bg-slate-100 rounded-lg overflow-hidden aspect-video">
-              <video
-                src={recordedUrl}
-                controls
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
-            </div>
+              {uploadStatus !== "idle" && (
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold text-[#4A5F43] dark:text-gray-300">
+                    <span>
+                      {uploadStatus === "compressing"
+                        ? "Compressing and cleaning audio..."
+                        : uploadStatus === "uploading"
+                        ? "Uploading to Praxis..."
+                        : "Upload complete"}
+                    </span>
+                    <span>{Math.round(uploadProgress)}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-[#E1EBD2] dark:bg-gray-700">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        uploadStatus === "success" ? "bg-green-500" : "bg-[#3A7D44]"
+                      }`}
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </section>
           )}
         </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="video/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
       </div>
     </div>
   );

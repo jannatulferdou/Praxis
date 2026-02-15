@@ -2,18 +2,174 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/Input";
-import { Alert } from "@/components/ui/Alert";
 import { Icon } from "@/components/Icon";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const ADMIN_PHONE = "01785904899";
+
+const COUNTRIES = [
+  { code: "+93", name: "Afghanistan", flag: "🇦🇫" },
+  { code: "+355", name: "Albania", flag: "🇦🇱" },
+  { code: "+213", name: "Algeria", flag: "🇩🇿" },
+  { code: "+1", name: "United States", flag: "🇺🇸" },
+  { code: "+376", name: "Andorra", flag: "🇦🇩" },
+  { code: "+244", name: "Angola", flag: "🇦🇴" },
+  { code: "+54", name: "Argentina", flag: "🇦🇷" },
+  { code: "+374", name: "Armenia", flag: "🇦🇲" },
+  { code: "+61", name: "Australia", flag: "🇦🇺" },
+  { code: "+43", name: "Austria", flag: "🇦🇹" },
+  { code: "+994", name: "Azerbaijan", flag: "🇦🇿" },
+  { code: "+973", name: "Bahrain", flag: "🇧🇭" },
+  { code: "+880", name: "Bangladesh", flag: "🇧🇩" },
+  { code: "+375", name: "Belarus", flag: "🇧🇾" },
+  { code: "+32", name: "Belgium", flag: "🇧🇪" },
+  { code: "+501", name: "Belize", flag: "🇧🇿" },
+  { code: "+229", name: "Benin", flag: "🇧🇯" },
+  { code: "+975", name: "Bhutan", flag: "🇧🇹" },
+  { code: "+591", name: "Bolivia", flag: "🇧🇴" },
+  { code: "+387", name: "Bosnia", flag: "🇧🇦" },
+  { code: "+55", name: "Brazil", flag: "🇧🇷" },
+  { code: "+673", name: "Brunei", flag: "🇧🇳" },
+  { code: "+359", name: "Bulgaria", flag: "🇧🇬" },
+  { code: "+226", name: "Burkina Faso", flag: "🇧🇫" },
+  { code: "+257", name: "Burundi", flag: "🇧🇮" },
+  { code: "+855", name: "Cambodia", flag: "🇰🇭" },
+  { code: "+237", name: "Cameroon", flag: "🇨🇲" },
+  { code: "+1", name: "Canada", flag: "🇨🇦" },
+  { code: "+56", name: "Chile", flag: "🇨🇱" },
+  { code: "+86", name: "China", flag: "🇨🇳" },
+  { code: "+57", name: "Colombia", flag: "🇨🇴" },
+  { code: "+506", name: "Costa Rica", flag: "🇨🇷" },
+  { code: "+385", name: "Croatia", flag: "🇭🇷" },
+  { code: "+53", name: "Cuba", flag: "🇨🇺" },
+  { code: "+357", name: "Cyprus", flag: "🇨🇾" },
+  { code: "+420", name: "Czech Republic", flag: "🇨🇿" },
+  { code: "+45", name: "Denmark", flag: "🇩🇰" },
+  { code: "+253", name: "Djibouti", flag: "🇩🇯" },
+  { code: "+593", name: "Ecuador", flag: "🇪🇨" },
+  { code: "+20", name: "Egypt", flag: "🇪🇬" },
+  { code: "+503", name: "El Salvador", flag: "🇸🇻" },
+  { code: "+372", name: "Estonia", flag: "🇪🇪" },
+  { code: "+251", name: "Ethiopia", flag: "🇪🇹" },
+  { code: "+679", name: "Fiji", flag: "🇫🇯" },
+  { code: "+358", name: "Finland", flag: "🇫🇮" },
+  { code: "+33", name: "France", flag: "🇫🇷" },
+  { code: "+995", name: "Georgia", flag: "🇬🇪" },
+  { code: "+49", name: "Germany", flag: "🇩🇪" },
+  { code: "+233", name: "Ghana", flag: "🇬🇭" },
+  { code: "+30", name: "Greece", flag: "🇬🇷" },
+  { code: "+502", name: "Guatemala", flag: "🇬🇹" },
+  { code: "+224", name: "Guinea", flag: "🇬🇳" },
+  { code: "+509", name: "Haiti", flag: "🇭🇹" },
+  { code: "+504", name: "Honduras", flag: "🇭🇳" },
+  { code: "+852", name: "Hong Kong", flag: "🇭🇰" },
+  { code: "+36", name: "Hungary", flag: "🇭🇺" },
+  { code: "+354", name: "Iceland", flag: "🇮🇸" },
+  { code: "+91", name: "India", flag: "🇮🇳" },
+  { code: "+62", name: "Indonesia", flag: "🇮🇩" },
+  { code: "+98", name: "Iran", flag: "🇮🇷" },
+  { code: "+964", name: "Iraq", flag: "🇮🇶" },
+  { code: "+353", name: "Ireland", flag: "🇮🇪" },
+  { code: "+972", name: "Israel", flag: "🇮🇱" },
+  { code: "+39", name: "Italy", flag: "🇮🇹" },
+  { code: "+81", name: "Japan", flag: "🇯🇵" },
+  { code: "+962", name: "Jordan", flag: "🇯🇴" },
+  { code: "+7", name: "Kazakhstan", flag: "🇰🇿" },
+  { code: "+254", name: "Kenya", flag: "🇰🇪" },
+  { code: "+965", name: "Kuwait", flag: "🇰🇼" },
+  { code: "+996", name: "Kyrgyzstan", flag: "🇰🇬" },
+  { code: "+856", name: "Laos", flag: "🇱🇦" },
+  { code: "+371", name: "Latvia", flag: "🇱🇻" },
+  { code: "+961", name: "Lebanon", flag: "🇱🇧" },
+  { code: "+231", name: "Liberia", flag: "🇱🇷" },
+  { code: "+218", name: "Libya", flag: "🇱🇾" },
+  { code: "+370", name: "Lithuania", flag: "🇱🇹" },
+  { code: "+352", name: "Luxembourg", flag: "🇱🇺" },
+  { code: "+853", name: "Macau", flag: "🇲🇴" },
+  { code: "+261", name: "Madagascar", flag: "🇲🇬" },
+  { code: "+265", name: "Malawi", flag: "🇲🇼" },
+  { code: "+60", name: "Malaysia", flag: "🇲🇾" },
+  { code: "+960", name: "Maldives", flag: "🇲🇻" },
+  { code: "+223", name: "Mali", flag: "🇲🇱" },
+  { code: "+356", name: "Malta", flag: "🇲🇹" },
+  { code: "+52", name: "Mexico", flag: "🇲🇽" },
+  { code: "+377", name: "Monaco", flag: "🇲🇨" },
+  { code: "+976", name: "Mongolia", flag: "🇲🇳" },
+  { code: "+382", name: "Montenegro", flag: "🇲🇪" },
+  { code: "+212", name: "Morocco", flag: "🇲🇦" },
+  { code: "+258", name: "Mozambique", flag: "🇲🇿" },
+  { code: "+95", name: "Myanmar", flag: "🇲🇲" },
+  { code: "+264", name: "Namibia", flag: "🇳🇦" },
+  { code: "+977", name: "Nepal", flag: "🇳🇵" },
+  { code: "+31", name: "Netherlands", flag: "🇳🇱" },
+  { code: "+64", name: "New Zealand", flag: "🇳🇿" },
+  { code: "+505", name: "Nicaragua", flag: "🇳🇮" },
+  { code: "+227", name: "Niger", flag: "🇳🇪" },
+  { code: "+234", name: "Nigeria", flag: "🇳🇬" },
+  { code: "+47", name: "Norway", flag: "🇳🇴" },
+  { code: "+968", name: "Oman", flag: "🇴🇲" },
+  { code: "+92", name: "Pakistan", flag: "🇵🇰" },
+  { code: "+970", name: "Palestine", flag: "🇵🇸" },
+  { code: "+507", name: "Panama", flag: "🇵🇦" },
+  { code: "+595", name: "Paraguay", flag: "🇵🇾" },
+  { code: "+51", name: "Peru", flag: "🇵🇪" },
+  { code: "+63", name: "Philippines", flag: "🇵🇭" },
+  { code: "+48", name: "Poland", flag: "🇵🇱" },
+  { code: "+351", name: "Portugal", flag: "🇵🇹" },
+  { code: "+974", name: "Qatar", flag: "🇶🇦" },
+  { code: "+40", name: "Romania", flag: "🇷🇴" },
+  { code: "+7", name: "Russia", flag: "🇷🇺" },
+  { code: "+250", name: "Rwanda", flag: "🇷🇼" },
+  { code: "+966", name: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "+221", name: "Senegal", flag: "🇸🇳" },
+  { code: "+381", name: "Serbia", flag: "🇷🇸" },
+  { code: "+65", name: "Singapore", flag: "🇸🇬" },
+  { code: "+421", name: "Slovakia", flag: "🇸🇰" },
+  { code: "+386", name: "Slovenia", flag: "🇸🇮" },
+  { code: "+252", name: "Somalia", flag: "🇸🇴" },
+  { code: "+27", name: "South Africa", flag: "🇿🇦" },
+  { code: "+82", name: "South Korea", flag: "🇰🇷" },
+  { code: "+34", name: "Spain", flag: "🇪🇸" },
+  { code: "+94", name: "Sri Lanka", flag: "🇱🇰" },
+  { code: "+249", name: "Sudan", flag: "🇸🇩" },
+  { code: "+46", name: "Sweden", flag: "🇸🇪" },
+  { code: "+41", name: "Switzerland", flag: "🇨🇭" },
+  { code: "+963", name: "Syria", flag: "🇸🇾" },
+  { code: "+886", name: "Taiwan", flag: "🇹🇼" },
+  { code: "+992", name: "Tajikistan", flag: "🇹🇯" },
+  { code: "+255", name: "Tanzania", flag: "🇹🇿" },
+  { code: "+66", name: "Thailand", flag: "🇹🇭" },
+  { code: "+228", name: "Togo", flag: "🇹🇬" },
+  { code: "+216", name: "Tunisia", flag: "🇹🇳" },
+  { code: "+90", name: "Turkey", flag: "🇹🇷" },
+  { code: "+993", name: "Turkmenistan", flag: "🇹🇲" },
+  { code: "+256", name: "Uganda", flag: "🇺🇬" },
+  { code: "+380", name: "Ukraine", flag: "🇺🇦" },
+  { code: "+971", name: "UAE", flag: "🇦🇪" },
+  { code: "+44", name: "United Kingdom", flag: "🇬🇧" },
+  { code: "+598", name: "Uruguay", flag: "🇺🇾" },
+  { code: "+998", name: "Uzbekistan", flag: "🇺🇿" },
+  { code: "+58", name: "Venezuela", flag: "🇻🇪" },
+  { code: "+84", name: "Vietnam", flag: "🇻🇳" },
+  { code: "+967", name: "Yemen", flag: "🇾🇪" },
+  { code: "+260", name: "Zambia", flag: "🇿🇲" },
+  { code: "+263", name: "Zimbabwe", flag: "🇿🇼" }
+];
 
 export default function LoginPage() {
   const router = useRouter();
   const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("+880");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [authMethod, setAuthMethod] = useState<"phone" | "google">("phone");
+
+  const filteredCountries = COUNTRIES.filter(country =>
+    country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    country.code.includes(searchQuery)
+  );
 
   const isValidPhone = (phoneNumber: string): boolean => {
     const cleanPhone = phoneNumber.replace(/\D/g, "");
@@ -90,11 +246,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F9F4] overflow-hidden relative">
+    <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 overflow-hidden relative">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 dark:bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 dark:bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
       </div>
 
       {/* Grid background pattern */}
@@ -105,6 +261,11 @@ export default function LoginPage() {
 
       {/* Content */}
       <div className="relative flex items-center justify-center min-h-screen px-4 py-4">
+        {/* ThemeToggle in top-right corner */}
+        <div className="absolute top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        
         <div className="w-full max-w-4xl">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Section - Form */}
@@ -114,8 +275,8 @@ export default function LoginPage() {
             <div className="flex justify-center mb-4">
               <Icon name="business-svgrepo-com" size={40} color="#3A7D44" />
             </div>
-            <h1 className="text-2xl font-bold text-green mb-1">Praxis</h1>
-            <p className="text-sm text-[#344E41]/8000">Verify your skills, land your future</p>
+            <h1 className="text-2xl font-bold text-green dark:text-gray-100 mb-1">Praxis</h1>
+            <p className="text-sm text-[#344E41]/8000 dark:text-gray-300">Verify your skills, land your future</p>
           </div>
 
           {/* Error Alert */}
@@ -127,13 +288,13 @@ export default function LoginPage() {
           )}
 
           {/* Auth Method Tabs */}
-          <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-white/30 rounded-lg backdrop-blur-sm border border-[#A3B18A]00/50">
+          <div className="grid grid-cols-2 gap-2 mb-6 p-1 bg-white/30 dark:bg-gray-800/30 rounded-lg backdrop-blur-sm border border-[#A3B18A]00/50 dark:border-gray-700">
             <button
               onClick={() => setAuthMethod("phone")}
               className={`py-1 px-2 rounded-md font-semibold text-xs transition-all duration-200 ${
                 authMethod === "phone"
-                  ? "bg-[#A3B18A]/10 text-[#3A7D44]00 border border-[#A3B18A]00/50"
-                  : "text-[#344E41]/6000 hover:text-[#344E41]/8000"
+                  ? "bg-[#A3B18A]/10 dark:bg-gray-700 text-[#3A7D44]00 dark:text-gray-100 border border-[#A3B18A]00/50 dark:border-gray-600"
+                  : "text-[#344E41]/6000 dark:text-gray-400 hover:text-[#344E41]/8000 dark:hover:text-gray-200"
               }`}
             >
               Phone
@@ -142,8 +303,8 @@ export default function LoginPage() {
               onClick={() => setAuthMethod("google")}
               className={`py-2 px-3 rounded-md font-semibold text-sm transition-all duration-200 ${
                 authMethod === "google"
-                  ? "bg-[#A3B18A]/10 text-[#3A7D44]00 border border-[#A3B18A]00/50"
-                  : "text-[#344E41]/6000 hover:text-[#344E41]/8000"
+                  ? "bg-[#A3B18A]/10 dark:bg-gray-700 text-[#3A7D44]00 dark:text-gray-100 border border-[#A3B18A]00/50 dark:border-gray-600"
+                  : "text-[#344E41]/6000 dark:text-gray-400 hover:text-[#344E41]/8000 dark:hover:text-gray-200"
               }`}
             >
               Google
@@ -154,24 +315,87 @@ export default function LoginPage() {
           {authMethod === "phone" && (
             <form onSubmit={handlePhoneLogin} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-green-500 mb-2 flex items-center gap-2">
+                <label className="block text-sm font-semibold text-green-500 dark:text-gray-200 mb-2 flex items-center gap-2">
                   <Icon name="user-svgrepo-com" size={18} color="#217d2f" />
                   Phone Number
                 </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    placeholder="01XXXXXXXXX"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                    disabled={loading}
-                    autoFocus
-                    className="w-full px-4 py-3 pl-10 bg-green-500/50 border border-[#A3B18A]00/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-[#A3B18A]00 focus:ring-1 focus:ring-blue-400/50 transition-all disabled:opacity-50"
-                  />
-                  <Icon name="mail-svgrepo-com" size={18} color="#94A3B8" className="absolute left-3 top-3.5" />
+                <div className="flex gap-2">
+                  {/* Custom Country Code Dropdown with Search */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowDropdown(!showDropdown)}
+                      disabled={loading}
+                      className="px-3 py-3 bg-green-500/50 dark:bg-gray-800/50 border border-[#A3B18A]00/50 dark:border-gray-700 rounded-lg text-white dark:text-gray-100 focus:outline-none focus:border-[#A3B18A]00 dark:focus:border-gray-600 focus:ring-1 focus:ring-blue-400/50 transition-all disabled:opacity-50 flex items-center gap-2 min-w-[120px]"
+                    >
+                      <span>{COUNTRIES.find(c => c.code === countryCode)?.flag} {countryCode}</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {showDropdown && (
+                      <div className="absolute z-50 mt-2 w-80 bg-white dark:bg-gray-800 border border-[#A3B18A]/40 dark:border-gray-700 rounded-lg shadow-xl max-h-96 overflow-hidden">
+                        {/* Search Input */}
+                        <div className="p-3 border-b border-[#A3B18A]/30 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800">
+                          <input
+                            type="text"
+                            placeholder="Search country or code..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-[#344E41] dark:text-gray-100 text-sm focus:outline-none focus:border-[#3A7D44] dark:focus:border-blue-500"
+                            autoFocus
+                          />
+                        </div>
+
+                        {/* Country List */}
+                        <div className="overflow-y-auto max-h-80">
+                          {filteredCountries.length > 0 ? (
+                            filteredCountries.map((country) => (
+                              <button
+                                key={country.code + country.name}
+                                type="button"
+                                onClick={() => {
+                                  setCountryCode(country.code);
+                                  setShowDropdown(false);
+                                  setSearchQuery("");
+                                  setError(null);
+                                }}
+                                className={`w-full text-left px-4 py-2.5 hover:bg-[#3A7D44]/10 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors ${
+                                  countryCode === country.code ? "bg-[#3A7D44]/20 dark:bg-gray-700" : ""
+                                }`}
+                              >
+                                <span className="text-2xl">{country.flag}</span>
+                                <div className="flex-1">
+                                  <span className="text-[#344E41] dark:text-gray-100 text-sm font-medium">{country.name}</span>
+                                </div>
+                                <span className="text-[#344E41]/60 dark:text-gray-400 text-sm font-mono">{country.code}</span>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="px-4 py-8 text-center text-[#344E41]/60 dark:text-gray-400 text-sm">
+                              No countries found
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="relative flex-1">
+                    <input
+                      type="tel"
+                      placeholder={countryCode === "+880" ? "01XXXXXXXXX" : "Phone number"}
+                      value={phone}
+                      onChange={handlePhoneChange}
+                      disabled={loading}
+                      className="w-full px-4 py-3 pl-10 bg-green-500/50 dark:bg-gray-800/50 border border-[#A3B18A]00/50 dark:border-gray-700 rounded-lg text-white dark:text-gray-100 placeholder-slate-500 dark:placeholder-gray-400 focus:outline-none focus:border-[#A3B18A]00 dark:focus:border-gray-600 focus:ring-1 focus:ring-blue-400/50 transition-all disabled:opacity-50"
+                    />
+                    <Icon name="mail-svgrepo-com" size={18} color="#94A3B8" className="absolute left-3 top-3.5" />
+                  </div>
                 </div>
-                <p className="text-xs text-[#344E41]/6000 mt-2">
-                  ✓ Enter your 11-digit phone number (01XXXXXXXXX)
+                <p className="text-xs text-[#344E41]/6000 dark:text-gray-400 mt-2">
+                  {countryCode === "+880" ? "✓ Enter your 11-digit phone number (01XXXXXXXXX)" : "✓ Enter your phone number"}
                 </p>
               </div>
 
@@ -201,14 +425,14 @@ export default function LoginPage() {
           {/* Google Login */}
           {authMethod === "google" && (
             <div className="space-y-6">
-              <p className="text-sm text-[#344E41]/8000 text-center">
+              <p className="text-sm text-[#344E41]/8000 dark:text-gray-300 text-center">
                 Sign in with your Google account to get started
               </p>
 
               <button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full bg-white/50 hover:bg-slate-700/50 disabled:bg-slate-700/30 border-2 border-[#A3B18A]00/50 hover:border-[#A3B18A]00 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-3"
+                className="w-full bg-white/50 dark:bg-gray-800/50 hover:bg-slate-700/50 dark:hover:bg-gray-700/50 disabled:bg-slate-700/30 dark:disabled:bg-gray-800/30 border-2 border-[#A3B18A]00/50 dark:border-gray-700 hover:border-[#A3B18A]00 dark:hover:border-gray-600 text-white dark:text-gray-100 font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-3"
               >
                 {loading ? (
                   <>
@@ -236,25 +460,55 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#A3B18A]00/50" />
+              <div className="w-full border-t border-[#A3B18A]00/50 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-[#F7F9F4] text-[#344E41]/6000">or</span>
+              <span className="px-3 bg-[#F7F9F4] dark:bg-gray-900 text-[#344E41]/6000 dark:text-gray-400">or</span>
             </div>
           </div>
 
           {/* Info */}
-          <div className="bg-[#A3B18A]/10 border border-[#A3B18A]00/50 rounded-lg p-4 backdrop-blur-sm">
+          <div className="bg-[#A3B18A]/10 dark:bg-gray-800/50 border border-[#A3B18A]00/50 dark:border-gray-700 rounded-lg p-4 backdrop-blur-sm">
             <div className="flex gap-3 items-start">
               <Icon name="notify-svgrepo-com" size={20} color="#3a7d44" className="flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-[#3A7D44]200">
-                <span className="font-semibold">Demo:</span> Use <code className="bg-[#3A7D44]500/30 px-2 py-1 rounded text-[#3A7D44]100 font-mono text-xs border border-[#A3B18A]00/50">01785904899</code> for admin access
+              <p className="text-sm text-[#3A7D44]200 dark:text-gray-300">
+                <span className="font-semibold">Demo:</span> Use <code className="bg-[#3A7D44]500/30 dark:bg-gray-700 px-2 py-1 rounded text-[#3A7D44]100 dark:text-gray-200 font-mono text-xs border border-[#A3B18A]00/50 dark:border-gray-600">01785904899</code> for admin access
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 space-y-5">
+            <div className="bg-white/40 dark:bg-gray-800/40 border border-[#A3B18A]/40 dark:border-gray-700 rounded-2xl p-5 shadow-sm">
+              <h2 className="text-lg font-semibold text-[#344E41] dark:text-gray-100">What you unlock after signing in</h2>
+              <p className="text-sm text-[#344E41]/8000 dark:text-gray-300 mt-2 leading-relaxed">
+                The Praxis secure workspace guides you through evidence capture, interview readiness, and opportunity matching. Every interaction is timestamped so you can prove progress when applying to accelerators, training cohorts, or funders.
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-[#344E41]/7000">
+                <li className="flex gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#3A7D44]" />
+                  Track each recording attempt with context tags, reviewer feedback, and exportable receipts.
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#3A7D44]" />
+                  Receive AI-generated talking points that translate your lived experience into employer-ready language.
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#3A7D44]" />
+                  Unlock your Praxis Skill Wallet to showcase verified evidence in a single shareable link.
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-[#3A7D44]/10 dark:bg-gray-800/50 border border-[#3A7D44]/30 dark:border-gray-700 rounded-2xl p-5">
+              <h3 className="text-lg font-semibold text-[#344E41] dark:text-gray-100">Our data stewardship pledge</h3>
+              <p className="text-sm text-[#344E41]/8000 dark:text-gray-300 mt-2 leading-relaxed">
+                Login credentials only identify you inside Praxis. Video proofs stay encrypted, every share request creates an audit log, and partners sign accountable use agreements. You remain the owner of your narrative, and you can revoke any employer&rsquo;s access at any time.
               </p>
             </div>
           </div>
 
           {/* Footer */}
-          <p className="text-xs text-[#344E41]/6000 text-center mt-8">
+          <p className="text-xs text-[#344E41]/6000 dark:text-gray-400 text-center mt-8">
             By signing in, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>
@@ -264,7 +518,7 @@ export default function LoginPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-[#3A7D44] to-[#A3B18A]500/20 to-slate-600/20 rounded-3xl blur-3xl" />
           <div className="relative group w-80 h-80">
             <div className="absolute -inset-1 bg-gradient-to-r from-[#3A7D44] to-[#A3B18A]600 to-slate-600 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-300 animate-pulse" />
-            <div className="relative bg-white/50 backdrop-blur-xl rounded-2xl p-6 border border-[#A3B18A]00/50 flex items-center justify-center w-full h-full">
+            <div className="relative bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-2xl p-6 border border-[#A3B18A]00/50 dark:border-gray-700 flex items-center justify-center w-full h-full">
               <Icon name="earth-svgrepo-com" size={160} color="#3A7D44" />
             </div>
           </div>
@@ -276,9 +530,9 @@ export default function LoginPage() {
               { icon: "shield-empty-svgrepo-com", text: "Data Protected", color: "#8B5CF6" },
               { icon: "accelerate-svgrepo-com", text: "Fast Access", color: "#F59E0B" }
             ].map((badge, i) => (
-              <div key={i} className="flex items-center gap-3 bg-white/30 p-4 rounded-lg border border-[#A3B18A]00/50 hover:border-slate-600/80 transition-all">
+              <div key={i} className="flex items-center gap-3 bg-white/30 dark:bg-gray-800/30 p-4 rounded-lg border border-[#A3B18A]00/50 dark:border-gray-700 hover:border-slate-600/80 dark:hover:border-gray-600 transition-all">
                 <Icon name={badge.icon} size={24} color={badge.color} />
-                <span className="text-white font-semibold text-sm">{badge.text}</span>
+                <span className="text-white dark:text-gray-100 font-semibold text-sm">{badge.text}</span>
               </div>
             ))}
           </div>

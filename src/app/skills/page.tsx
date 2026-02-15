@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function SkillsPage() {
   const router = useRouter();
-  const [skills, setSkills] = useState([
+  const [skills] = useState([
     {
       name: "JavaScript",
       confidence: 92,
@@ -58,22 +59,15 @@ export default function SkillsPage() {
     }
   }, [router]);
 
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 90) return "bg-green-500";
-    if (confidence >= 80) return "bg-[#3A7D44]500";
-    if (confidence >= 70) return "bg-yellow-500";
-    return "bg-orange-500";
-  };
-
   const categories = Array.from(new Set(skills.map((s) => s.category)));
   const overallScore = Math.round(skills.reduce((acc, s) => acc + s.confidence, 0) / skills.length);
 
   return (
-    <div className="min-h-screen bg-[#F7F9F4] overflow-hidden relative">
+    <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 overflow-hidden relative">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 dark:bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 dark:bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
       </div>
 
       {/* Grid background pattern */}
@@ -83,19 +77,24 @@ export default function SkillsPage() {
       }} />
 
       <div className="relative max-w-4xl mx-auto px-4 py-4 sm:py-6">
+        {/* ThemeToggle in top-right corner */}
+        <div className="absolute top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-4">
             <Icon name="business-svgrepo-com" size={32} color="#3A7D44" />
-            <h1 className="text-2xl font-bold text-white">Your Verified Skills</h1>
+            <h1 className="text-2xl font-bold text-white dark:text-gray-100">Your Verified Skills</h1>
           </div>
-          <p className="text-sm text-[#344E41]/8000">Skills identified and verified from your video</p>
+          <p className="text-sm text-[#344E41]/8000 dark:text-gray-300">Skills identified and verified from your video</p>
         </div>
 
         {/* Overall Score */}
         <div className="grid md:grid-cols-3 gap-3 mb-6">
-          <div className="bg-[#A3B18A]/10 backdrop-blur-xl rounded-lg p-4 border border-[#A3B18A]00/50">
-            <p className="text-sm text-[#3A7D44]200 font-semibold mb-2 flex items-center gap-2">
+          <div className="bg-[#A3B18A]/10 dark:bg-gray-800/50 backdrop-blur-xl rounded-lg p-4 border border-[#A3B18A]00/50 dark:border-gray-700">
+            <p className="text-sm text-[#3A7D44]200 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2">
               <Icon name="trophy-svgrepo-com" size={18} color="#3A7D44" />
               Overall Score
             </p>
@@ -116,32 +115,32 @@ export default function SkillsPage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-[#3A7D44]00">{overallScore}%</span>
+                  <span className="text-2xl font-bold text-[#3A7D44]00 dark:text-blue-400">{overallScore}%</span>
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-[#3A7D44]200">{overallScore}/100</p>
-                <p className="text-sm text-[#3A7D44]00 mt-1">Professional Level</p>
+                <p className="text-3xl font-bold text-[#3A7D44]200 dark:text-gray-100">{overallScore}/100</p>
+                <p className="text-sm text-[#3A7D44]00 dark:text-gray-400 mt-1">Professional Level</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-emerald-500/20 border border-emerald-400/50 rounded-lg p-6 backdrop-blur-xl">
-            <p className="text-sm text-emerald-200 font-semibold mb-3 flex items-center gap-2">
+          <div className="bg-emerald-500/20 dark:bg-emerald-900/30 border border-emerald-400/50 dark:border-emerald-700 rounded-lg p-6 backdrop-blur-xl">
+            <p className="text-sm text-emerald-200 dark:text-emerald-300 font-semibold mb-3 flex items-center gap-2">
               <Icon name="check-circle-svgrepo-com" size={18} color="#10B981" />
               Verified
             </p>
-            <p className="text-3xl font-bold text-emerald-300">{skills.length}</p>
-            <p className="text-sm text-emerald-200 mt-1">Skills identified</p>
+            <p className="text-3xl font-bold text-emerald-300 dark:text-emerald-400">{skills.length}</p>
+            <p className="text-sm text-emerald-200 dark:text-emerald-300 mt-1">Skills identified</p>
           </div>
 
-          <div className="bg-violet-500/20 border border-violet-400/50 rounded-lg p-6 backdrop-blur-xl">
-            <p className="text-sm text-violet-200 font-semibold mb-3 flex items-center gap-2">
+          <div className="bg-violet-500/20 dark:bg-violet-900/30 border border-violet-400/50 dark:border-violet-700 rounded-lg p-6 backdrop-blur-xl">
+            <p className="text-sm text-violet-200 dark:text-violet-300 font-semibold mb-3 flex items-center gap-2">
               <Icon name="column-chart-svgrepo-com" size={18} color="#8B5CF6" />
               Categories
             </p>
-            <p className="text-3xl font-bold text-violet-300">{categories.length}</p>
-            <p className="text-sm text-violet-200 mt-1">Skill areas</p>
+            <p className="text-3xl font-bold text-violet-300 dark:text-violet-400">{categories.length}</p>
+            <p className="text-sm text-violet-200 dark:text-violet-300 mt-1">Skill areas</p>
           </div>
         </div>
 
@@ -151,27 +150,27 @@ export default function SkillsPage() {
             const categorySkills = skills.filter((s) => s.category === category);
             return (
               <div key={category}>
-                <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold text-white dark:text-gray-100 mb-4 flex items-center gap-2">
                   <Icon name="trending-up-svgrepo-com" size={20} color="#3A7D44" />
                   {category}
                 </h2>
                 <div className="grid md:grid-cols-2 gap-3">
                   {categorySkills.map((skill) => (
-                    <div key={skill.name} className="bg-white/30 border border-[#A3B18A]00/50 rounded-md p-3 hover:border-slate-600/80 transition-all duration-200 backdrop-blur-sm">
+                    <div key={skill.name} className="bg-white/30 dark:bg-gray-800/30 border border-[#A3B18A]00/50 dark:border-gray-700 rounded-md p-3 hover:border-slate-600/80 dark:hover:border-gray-600 transition-all duration-200 backdrop-blur-sm">
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <Icon name={skill.icon} size={20} color={skill.color} />
-                            <p className="font-semibold text-white">{skill.name}</p>
+                            <p className="font-semibold text-white dark:text-gray-100">{skill.name}</p>
                           </div>
-                          <p className="text-xs text-[#344E41]/6000 mt-1">{skill.category}</p>
+                          <p className="text-xs text-[#344E41]/6000 dark:text-gray-400 mt-1">{skill.category}</p>
                         </div>
                         <Icon name="check-circle-svgrepo-com" size={20} color="#10B981" />
                       </div>
 
                       {/* Confidence Bar */}
                       <div className="space-y-2">
-                        <div className="w-full bg-slate-700/50 rounded-full h-2">
+                        <div className="w-full bg-slate-700/50 dark:bg-gray-600/50 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all duration-300`}
                             style={{ 
@@ -181,8 +180,8 @@ export default function SkillsPage() {
                           />
                         </div>
                         <div className="flex justify-between items-center text-xs">
-                          <span className="text-[#344E41]/6000">Confidence</span>
-                          <span className="font-semibold text-[#344E41]/8000">{skill.confidence}%</span>
+                          <span className="text-[#344E41]/6000 dark:text-gray-400">Confidence</span>
+                          <span className="font-semibold text-[#344E41]/8000 dark:text-gray-300">{skill.confidence}%</span>
                         </div>
                       </div>
                     </div>
@@ -194,7 +193,7 @@ export default function SkillsPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid md:grid-cols-2 gap-3 mt-8 pt-6 border-t border-[#A3B18A]00/50">
+        <div className="grid md:grid-cols-2 gap-3 mt-8 pt-6 border-t border-[#A3B18A]00/50 dark:border-gray-700">
           <button
             onClick={() => router.push("/jobs")}
             className="px-4 py-2 text-sm bg-gradient-to-r from-[#3A7D44] to-[#2D5F34] hover:from-[#2D5F34] hover:to-[#25492A] text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
@@ -205,7 +204,7 @@ export default function SkillsPage() {
 
           <button
             onClick={() => router.push("/start")}
-            className="px-4 py-2 text-sm bg-slate-700/50 hover:bg-slate-700 border border-slate-600/50 hover:border-slate-500 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+            className="px-4 py-2 text-sm bg-slate-700/50 dark:bg-gray-700/50 hover:bg-slate-700 dark:hover:bg-gray-600 border border-slate-600/50 dark:border-gray-600 hover:border-slate-500 dark:hover:border-gray-500 text-white dark:text-gray-100 font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
           >
             <Icon name="arrow-left-svgrepo-com" size={18} color="white" />
             Back to Dashboard
@@ -213,10 +212,10 @@ export default function SkillsPage() {
         </div>
 
         {/* Info Box */}
-        <div className="mt-8 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-400/50 rounded-lg p-4 backdrop-blur-sm">
+        <div className="mt-8 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 dark:from-emerald-900/30 dark:to-teal-900/30 border border-emerald-400/50 dark:border-emerald-700 rounded-lg p-4 backdrop-blur-sm">
           <div className="flex gap-3 items-start">
             <Icon name="check-circle-svgrepo-com" size={20} color="#10B981" className="flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-emerald-100">
+            <div className="text-sm text-emerald-100 dark:text-emerald-200">
               <p className="font-semibold mb-1">Your Profile is Ready!</p>
               <p>Share your verified skills with employers and apply to matching jobs.</p>
             </div>

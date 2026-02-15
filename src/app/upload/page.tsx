@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { apiService } from "@/services/api";
 
 export default function UploadPage() {
@@ -111,11 +112,11 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F9F4] overflow-hidden relative">
+    <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 overflow-hidden relative">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 dark:bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 dark:bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
       </div>
 
       {/* Grid background pattern */}
@@ -125,13 +126,18 @@ export default function UploadPage() {
       }} />
 
       <div className="relative max-w-2xl mx-auto px-4 py-4 sm:py-6">
+        {/* ThemeToggle in top-right corner */}
+        <div className="absolute top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        
         {/* Header */}
         <div className="mb-5">
           <div className="flex items-center gap-3 mb-4">
             <Icon name="business-svgrepo-com" size={32} color="#3A7D44" />
-            <h1 className="text-2xl font-bold text-white">Upload Video</h1>
+            <h1 className="text-2xl font-bold text-white dark:text-gray-100">Upload Video</h1>
           </div>
-          <p className="text-sm text-[#344E41]/8000">Upload a pre-recorded video to verify your skills</p>
+          <p className="text-sm text-[#344E41]/8000 dark:text-gray-300">Upload a pre-recorded video to verify your skills</p>
         </div>
 
         {/* Error Alert */}
@@ -152,12 +158,12 @@ export default function UploadPage() {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className="border-2 border-dashed border-[#A3B18A]00/50 rounded-xl p-8 text-center bg-white/30 transition-colors duration-200 cursor-pointer hover:border-[#A3B18A]00 hover:bg-[#3A7D44]500/10 backdrop-blur-sm"
+              className="border-2 border-dashed border-[#A3B18A]00/50 dark:border-gray-700 rounded-xl p-8 text-center bg-white/30 dark:bg-gray-800/30 transition-colors duration-200 cursor-pointer hover:border-[#A3B18A]00 dark:hover:border-gray-600 hover:bg-[#3A7D44]500/10 dark:hover:bg-gray-700/50 backdrop-blur-sm"
               onClick={() => fileInputRef.current?.click()}
             >
               <Icon name="upload-svgrepo-com" size={48} color="#3A7D44" className="mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">Drop video here or click to browse</h3>
-              <p className="text-sm text-[#344E41]/6000 mb-4">
+              <h3 className="text-lg font-semibold text-white dark:text-gray-100 mb-2">Drop video here or click to browse</h3>
+              <p className="text-sm text-[#344E41]/6000 dark:text-gray-400 mb-4">
                 Supports MP4, WebM, and other common video formats (max 100MB)
               </p>
               <input
@@ -171,12 +177,12 @@ export default function UploadPage() {
           ) : (
             <>
               {/* Selected File Info */}
-              <div className="bg-emerald-500/20 border border-emerald-400/50 rounded-xl p-4 backdrop-blur-sm">
+              <div className="bg-emerald-500/20 dark:bg-emerald-900/30 border border-emerald-400/50 dark:border-emerald-700 rounded-xl p-4 backdrop-blur-sm">
                 <div className="flex items-start gap-3">
                   <Icon name="document-svgrepo-com" size={24} color="#10B981" className="flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="font-semibold text-white">{selectedFile.name}</p>
-                    <p className="text-sm text-[#344E41]/6000">
+                    <p className="font-semibold text-white dark:text-gray-100">{selectedFile.name}</p>
+                    <p className="text-sm text-[#344E41]/6000 dark:text-gray-400">
                       {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
@@ -186,7 +192,7 @@ export default function UploadPage() {
 
               {/* Video Preview */}
               {preview && (
-                <div className="rounded-lg overflow-hidden bg-black aspect-video border border-[#A3B18A]00/50">
+                <div className="rounded-lg overflow-hidden bg-black aspect-video border border-[#A3B18A]00/50 dark:border-gray-700">
                   <video
                     src={preview}
                     controls
@@ -197,36 +203,36 @@ export default function UploadPage() {
 
               {/* Upload Progress */}
               {uploadStatus !== "idle" && (
-                <div className="space-y-3 p-4 bg-white/30 rounded-lg border border-[#A3B18A]00/50 backdrop-blur-sm">
+                <div className="space-y-3 p-4 bg-white/30 dark:bg-gray-800/30 rounded-lg border border-[#A3B18A]00/50 dark:border-gray-700 backdrop-blur-sm">
                   <div className="flex items-center gap-3 mb-3">
                     {uploadStatus === "success" ? (
                       <>
                         <Icon name="check-circle-svgrepo-com" size={24} color="#10B981" />
-                        <span className="font-semibold text-emerald-300">Upload Complete!</span>
+                        <span className="font-semibold text-emerald-300 dark:text-emerald-400">Upload Complete!</span>
                       </>
                     ) : (
                       <>
-                        <svg className="w-5 h-5 animate-spin text-[#3A7D44]00" fill="none" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 animate-spin text-[#3A7D44]00 dark:text-blue-400" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
-                        <span className="font-semibold text-[#3A7D44]00">Uploading...</span>
+                        <span className="font-semibold text-[#3A7D44]00 dark:text-blue-400">Uploading...</span>
                       </>
                     )}
                   </div>
 
-                  <div className="w-full bg-slate-700/50 rounded-full h-2">
+                  <div className="w-full bg-slate-700/50 dark:bg-gray-600/50 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all duration-300 ${
-                        uploadStatus === "success" ? "bg-emerald-500" : "bg-[#3A7D44]500"
+                        uploadStatus === "success" ? "bg-emerald-500" : "bg-[#3A7D44]500 dark:bg-blue-500"
                       }`}
                       style={{ width: `${uploadProgress}%` }}
                     />
                   </div>
 
-                  <div className="flex justify-between items-center text-xs text-[#344E41]/6000">
+                  <div className="flex justify-between items-center text-xs text-[#344E41]/6000 dark:text-gray-400">
                     <span>Transferring video...</span>
-                    <span className="font-semibold text-[#344E41]/8000">{Math.round(uploadProgress)}%</span>
+                    <span className="font-semibold text-[#344E41]/8000 dark:text-gray-300">{Math.round(uploadProgress)}%</span>
                   </div>
                 </div>
               )}
@@ -241,7 +247,7 @@ export default function UploadPage() {
                     setUploadStatus("idle");
                   }}
                   disabled={loading}
-                  className="px-6 py-3 bg-slate-700/50 hover:bg-slate-700 disabled:bg-slate-600 border border-slate-600/50 text-white font-semibold rounded-lg transition-all"
+                  className="px-6 py-3 bg-slate-700/50 dark:bg-gray-700/50 hover:bg-slate-700 dark:hover:bg-gray-600 disabled:bg-slate-600 dark:disabled:bg-gray-700 border border-slate-600/50 dark:border-gray-600 text-white dark:text-gray-100 font-semibold rounded-lg transition-all"
                 >
                   Change File
                 </button>
@@ -271,10 +277,10 @@ export default function UploadPage() {
           )}
 
           {/* Info Box */}
-          <div className="bg-[#A3B18A]/10 border border-[#A3B18A]00/50 rounded-lg p-4 backdrop-blur-sm">
+          <div className="bg-[#A3B18A]/10 dark:bg-gray-800/50 border border-[#A3B18A]00/50 dark:border-gray-700 rounded-lg p-4 backdrop-blur-sm">
             <div className="flex gap-3 items-start">
               <Icon name="notify-svgrepo-com" size={20} color="#3A7D44" className="flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-[#3A7D44]100">
+              <div className="text-sm text-[#3A7D44]100 dark:text-gray-300">
                 <p className="font-semibold mb-1">Requirements:</p>
                 <ul className="space-y-1 text-xs">
                   <li>✓ Video format: MP4, WebM, or other common formats</li>
@@ -288,7 +294,7 @@ export default function UploadPage() {
           {/* Back Button */}
           <button
             onClick={() => router.push("/start")}
-            className="w-full px-4 py-2 text-[#344E41]/6000 hover:text-[#344E41]/8000 font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
+            className="w-full px-4 py-2 text-[#344E41]/6000 dark:text-gray-400 hover:text-[#344E41]/8000 dark:hover:text-gray-300 font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
           >
             <Icon name="arrow-left-svgrepo-com" size={18} color="#94A3B8" />
             Back to Dashboard

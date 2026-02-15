@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function ProcessingPage() {
   const router = useRouter();
@@ -73,11 +74,11 @@ export default function ProcessingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F9F4] overflow-hidden relative">
+    <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 overflow-hidden relative">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 dark:bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 dark:bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
       </div>
 
       {/* Grid background pattern */}
@@ -87,17 +88,22 @@ export default function ProcessingPage() {
       }} />
 
       <div className="relative max-w-2xl mx-auto px-4 py-6 sm:py-8">
+        {/* ThemeToggle in top-right corner */}
+        <div className="absolute top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-3">
             <Icon name="business-svgrepo-com" size={40} color="#3A7D44" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-1">Processing Your Video</h1>
-          <p className="text-sm text-[#344E41]/8000">We're analyzing your skills and preparing your profile</p>
+          <h1 className="text-2xl font-bold text-white dark:text-gray-100 mb-1">Processing Your Video</h1>
+          <p className="text-sm text-[#344E41]/8000 dark:text-gray-300">We&apos;re analyzing your skills and preparing your profile</p>
         </div>
 
         {/* Processing Card */}
-        <div className="bg-white/50 backdrop-blur-xl border border-[#A3B18A]00/50 rounded-xl p-6 space-y-6">
+        <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border border-[#A3B18A]00/50 dark:border-gray-700 rounded-xl p-6 space-y-6">
           {/* Progress Visual */}
           <div className="flex justify-center">
             <div className="relative w-32 h-32">
@@ -129,24 +135,24 @@ export default function ProcessingPage() {
           {/* Status */}
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center gap-2">
-              <svg className="w-5 h-5 text-[#3A7D44]00 animate-spin" fill="none" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#3A7D44]00 dark:text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              <p className="text-lg font-semibold text-white capitalize">{status === "preparing" ? "Preparing" : status}</p>
+              <p className="text-lg font-semibold text-white dark:text-gray-100 capitalize">{status === "preparing" ? "Preparing" : status}</p>
             </div>
-            <p className="text-[#344E41]/6000">{getStatusMessage()}</p>
+            <p className="text-[#344E41]/6000 dark:text-gray-400">{getStatusMessage()}</p>
           </div>
 
           {/* Progress Bar */}
           <div className="space-y-2">
-            <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-slate-700/50 dark:bg-gray-700/50 rounded-full h-3 overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-[#3A7D44] to-[#2D5F34] transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <div className="flex justify-between text-xs text-[#344E41]/6000">
+            <div className="flex justify-between text-xs text-[#344E41]/6000 dark:text-gray-400">
               <span>Processing time remaining</span>
               <span className="font-semibold">~{Math.max(0, Math.round(estimatedTime))}s</span>
             </div>
@@ -169,10 +175,10 @@ export default function ProcessingPage() {
                   <div
                     className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                       isComplete
-                        ? "bg-green-100 text-green-600"
+                        ? "bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400"
                         : isActive
-                          ? "bg-[#3A7D44]100 text-[#3A7D44]600 scale-110"
-                          : "bg-slate-200 text-[#344E41]/6000"
+                          ? "bg-[#3A7D44]100 dark:bg-blue-900/50 text-[#3A7D44]600 dark:text-blue-400 scale-110"
+                          : "bg-slate-200 dark:bg-gray-700 text-[#344E41]/6000 dark:text-gray-500"
                     }`}
                   >
                     {isComplete ? (
@@ -183,7 +189,7 @@ export default function ProcessingPage() {
                   </div>
                   <span
                     className={`font-medium transition-colors ${
-                      isComplete || isActive ? "text-slate-900" : "text-slate-600"
+                      isComplete || isActive ? "text-slate-900 dark:text-gray-100" : "text-slate-600 dark:text-gray-400"
                     }`}
                   >
                     {step.label}
@@ -194,14 +200,14 @@ export default function ProcessingPage() {
           </div>
 
           {/* Info Box */}
-          <div className="bg-[#3A7D44]50 border border-[#A3B18A]200 rounded-lg p-4">
+          <div className="bg-[#3A7D44]50 dark:bg-gray-700/50 border border-[#A3B18A]200 dark:border-gray-600 rounded-lg p-4">
             <div className="flex gap-3 items-start">
               <Icon name="notify-svgrepo-com" size={20} color="#2563EB" className="flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-[#3A7D44]900">
+              <div className="text-sm text-[#3A7D44]900 dark:text-gray-300">
                 <p className="font-semibold mb-1">Processing Details:</p>
                 <ul className="space-y-1 text-xs">
                   <li>• Typically takes 30-60 seconds</li>
-                  <li>• ID: <code className="bg-[#3A7D44]100 px-2 py-0.5 rounded font-mono text-xs">{processingId}</code></li>
+                  <li>• ID: <code className="bg-[#3A7D44]100 dark:bg-gray-600 px-2 py-0.5 rounded font-mono text-xs">{processingId}</code></li>
                   <li>• You can safely close this page</li>
                 </ul>
               </div>
@@ -212,7 +218,7 @@ export default function ProcessingPage() {
         {/* Auto-redirect message */}
         {progress >= 100 && (
           <div className="mt-8 text-center">
-            <p className="text-green-600 font-semibold mb-4">✓ Processing complete! Redirecting...</p>
+            <p className="text-green-600 dark:text-green-400 font-semibold mb-4">✓ Processing complete! Redirecting...</p>
             <button
               onClick={() => router.push("/skills")}
               className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
@@ -223,79 +229,5 @@ export default function ProcessingPage() {
         )}
       </div>
     </div>
-  );
-}
-      clearTimeout(completeTimer);
-    };
-  }, [user.id]);
-
-  const fetchResults = async () => {
-    if (!user.id) return;
-    setError(null);
-
-    try {
-      if (user.id === "worker-001" && user.skills) {
-        setSkills(user.skills);
-        setJobMatches(user.jobMatches || []);
-        return;
-      }
-
-      const [skillsRes, matchesRes] = await Promise.all([
-        apiService.getExtractedSkills(user.id).catch(() => null),
-        apiService.getJobMatches(user.id).catch(() => null),
-      ]);
-
-      if (skillsRes?.data?.skills) {
-        setSkills(skillsRes.data.skills || []);
-      }
-
-      if (matchesRes?.data?.matches) {
-        setJobMatches(matchesRes.data.matches || []);
-      }
-    } catch (err: any) {
-      setError("ডেটা আনতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।");
-    }
-  };
-
-  return (
-    <>
-      <Header />
-      <main className="flex-1 bg-light py-12 grid-dots-sm">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-8 border border-gray-300 text-center">
-            <h1 className="text-3xl font-bold mb-2">এআই প্রসেসিং</h1>
-            <p className="text-gray-700 mb-6">
-              আপনার ভিডিও বিশ্লেষণ করা হচ্ছে। কিছুক্ষণ অপেক্ষা করুন।
-            </p>
-
-            {error && <Alert type="error" message={error} />}
-
-            <div className="flex justify-center mb-6">
-              <LoadingSpinner />
-            </div>
-
-            <ul className="text-left space-y-3 mb-6">
-              {STATUS_MESSAGES.map((message, index) => (
-                <li key={message} className="flex items-center gap-3 text-sm">
-                  <span
-                    className={`w-3 h-3 rounded-full ${
-                      index <= statusIndex ? "bg-green-500" : "bg-gray-300"
-                    }`}
-                  />
-                  <span className={index <= statusIndex ? "text-gray-900" : "text-gray-700"}>
-                    {message}
-                  </span>
-                </li>
-              ))}
-            </ul>
-
-            <Button onClick={() => router.push("/skill-wallet")} disabled={!isComplete}>
-              স্কিল ওয়ালেট দেখুন
-            </Button>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </>
   );
 }

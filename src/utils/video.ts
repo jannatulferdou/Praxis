@@ -1,12 +1,6 @@
 // Video compression and processing utilities
 // Compress video before upload to save bandwidth
 
-const COMPRESSION_SETTINGS = {
-  MAX_DURATION_MS: 30000,
-  TARGET_BITRATE: 500000, // 500kbps
-  TARGET_FRAMERATE: 24,
-};
-
 /**
  * Compress video blob using canvas (simple, client-side)
  * This downsamples frames and reduces quality for low-bandwidth

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function StartPage() {
   const router = useRouter();
@@ -36,32 +37,118 @@ export default function StartPage() {
     setIsAdmin(false);
   };
 
+  const howItWorks = [
+    {
+      step: "01",
+      title: "Capture your story",
+      summary: "Use any connected device to speak naturally about one recent project, gig, or shift.",
+      detail: "Praxis coaches you with Bangla and English prompts so you can highlight context, your role, and the measurable change you delivered in under 30 seconds."
+    },
+    {
+      step: "02",
+      title: "AI builds a skill graph",
+      summary: "Our multi-model pipeline converts your spoken narrative into structured capabilities.",
+      detail: "Temporal cues, action verbs, and industry vocabulary are matched against 1,200+ competency rubrics so employers see evidence, not buzzwords."
+    },
+    {
+      step: "03",
+      title: "Proof lives in your wallet",
+      summary: "Each claim is stamped with confidence scores, source audio, and reviewer notes.",
+      detail: "You can reuse the same verified clip when applying to training programs, apprenticeships, or government recognition schemes."
+    },
+    {
+      step: "04",
+      title: "Match with opportunities",
+      summary: "Praxis compares your profile with live projects from inclusive employers.",
+      detail: "Hiring teams receive a concise dossier that links your video moment with recommended interview questions, helping them move straight to offers."
+    }
+  ];
+
+  const personaHighlights = [
+    {
+      title: "Skilled workers & freelancers",
+      intro: "Electricians, garments technicians, drivers, salon artists, and on-demand platform earners use Praxis to document tacit skills that don&rsquo;t show up on paper CVs.",
+      bullets: [
+        "Translate day-to-day problem solving into the language recruiters understand.",
+        "Attach contextual assets such as workshop photos, safety certifications, or supervisor shout-outs.",
+        "Build credibility even if you are re-entering the workforce or switching sectors."
+      ]
+    },
+    {
+      title: "Hiring teams & NGOs",
+      intro: "Impact investors, BPO operators, and community organizations rely on Praxis to surface trustworthy talent pipelines in days, not months.",
+      bullets: [
+        "View transparent evidence trails instead of generic CV templates.",
+        "Filter by verified competency clusters, location readiness, and language comfort.",
+        "Co-brand assessment journeys so your trainees graduate with portable proof."
+      ]
+    }
+  ];
+
+  const successStories = [
+    {
+      quote: "Praxis helped me move from informal tailoring gigs to a full-time quality inspection role because the recruiter saw my problem-solving clip.",
+      person: "Afsana • Readymade Garments Technician",
+      meta: "Chattogram Export Processing Zone"
+    },
+    {
+      quote: "I recorded once at a community center and reused the link to win three freelance solar-installation contracts.",
+      person: "Kabir • Solar Technician & Field Trainer",
+      meta: "Khulna & Jashore"
+    },
+    {
+      quote: "Our NGO cohort shared Praxis wallets with city employers and achieved a 64% placement rate without extra paperwork.",
+      person: "Farzana • Workforce Program Lead",
+      meta: "Dhaka Urban Lab"
+    }
+  ];
+
+  const faqs = [
+    {
+      question: "Do I need perfect English to use Praxis?",
+      answer: "No. Speak in Bangla, English, or a mix—Praxis transcribes code-switching, captures tonal emphasis, and mirrors your original words so reviewers understand the nuance."
+    },
+    {
+      question: "What happens to my video after verification?",
+      answer: "Videos stay in your encrypted locker. You decide who receives a viewing link, and every share includes an expiry timer plus watermarking to prevent misuse."
+    },
+    {
+      question: "Is Praxis a traditional CV builder?",
+      answer: "Praxis is evidence-first. Instead of rewriting your CV, we pair short media clips with structured competency statements that plug directly into employer applicant tracking systems."
+    },
+    {
+      question: "Can teams integrate Praxis data into their dashboards?",
+      answer: "Yes. Hiring partners can sync verified skills into ATS or HRIS tools through our REST API, receive webhook alerts, and export audit logs for compliance reviews."
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#F7F9F4] overflow-hidden relative">
+    <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 overflow-hidden relative transition-colors">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
-        <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-[#A3B18A]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 7s ease-in-out infinite 2s" }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 dark:bg-[#3A7D44]/10 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 dark:bg-[#A3B18A]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-1/2 left-1/3 w-72 h-72 bg-[#A3B18A]/5 dark:bg-[#3A7D44]/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 7s ease-in-out infinite 2s" }} />
       </div>
 
       {/* Grid background pattern */}
-      <div className="absolute inset-0 opacity-[0.02]" style={{
+      <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]" style={{
         backgroundImage: "linear-gradient(0deg, transparent 24%, rgba(58, 125, 68, 0.05) 25%, rgba(58, 125, 68, 0.05) 26%, transparent 27%, transparent 74%, rgba(58, 125, 68, 0.05) 75%, rgba(58, 125, 68, 0.05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(58, 125, 68, 0.05) 25%, rgba(58, 125, 68, 0.05) 26%, transparent 27%, transparent 74%, rgba(58, 125, 68, 0.05) 75%, rgba(58, 125, 68, 0.05) 76%, transparent 77%, transparent)",
         backgroundSize: "50px 50px"
       }} />
 
       {/* Top Navigation */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[#F7F9F4]/80 backdrop-blur-md border-b border-[#A3B18A]/30">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-[#F7F9F4]/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-[#A3B18A]/30 dark:border-gray-700">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Icon name="business-svgrepo-com" size={32} color="#3A7D44" />
-            <h2 className="text-2xl font-bold text-[#344E41]">Praxis</h2>
+            <h2 className="text-2xl font-bold text-[#344E41] dark:text-[#A3B18A]">Praxis</h2>
           </div>
 
           {/* Auth Buttons */}
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {isLoggedIn ? (
               <>
                 {isAdmin && (
@@ -106,22 +193,22 @@ export default function StartPage() {
             {/* Left Section - Text */}
             <div className="space-y-5 pt-2">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#A3B18A]/20 border border-[#A3B18A]/50 rounded-full backdrop-blur-sm mb-1">
-                <span className="w-2 h-2 bg-[#3A7D44] rounded-full animate-pulse" />
-                <span className="text-xs font-semibold text-[#3A7D44]">AI-Powered Verification</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#A3B18A]/20 dark:bg-[#3A7D44]/20 border border-[#A3B18A]/50 dark:border-[#3A7D44]/50 rounded-full backdrop-blur-sm mb-1">
+                <span className="w-2 h-2 bg-[#3A7D44] dark:bg-[#A3B18A] rounded-full animate-pulse" />
+                <span className="text-xs font-semibold text-[#3A7D44] dark:text-[#A3B18A]">AI-Powered Verification</span>
               </div>
 
               {/* Headline */}
               <div>
-                <h1 className="text-5xl lg:text-6xl font-black text-[#344E41] leading-tight mb-2 tracking-tight">
+                <h1 className="text-5xl lg:text-6xl font-black text-[#344E41] dark:text-gray-100 leading-tight mb-2 tracking-tight">
                   Show Your
                   <br />
                   <span className="bg-gradient-to-r from-[#3A7D44] to-[#A3B18A] bg-clip-text text-transparent animate-pulse">
                     True Potential
                   </span>
                 </h1>
-                <p className="text-base lg:text-lg text-[#344E41]/8000 leading-relaxed max-w-md">
-                  Record a 30-second video, get AI-verified credentials, and land direct job opportunities from top employers.
+                <p className="text-base lg:text-lg text-[#344E41]/8000 dark:text-gray-300 leading-relaxed max-w-md">
+                  Record a 30-second skills story, receive AI-grade verification, and connect directly with inclusive employers across Bangladesh.
                 </p>
               </div>
 
@@ -133,7 +220,7 @@ export default function StartPage() {
                 >
                   <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <Icon name="earth-svgrepo-com" size={20} color="white" />
-                  <span className="relative">Begin Recording</span>
+                  <span className="relative">Upload</span>
                 </button>
 
                 {isAdmin && (
@@ -142,7 +229,7 @@ export default function StartPage() {
                     className="group w-full border-2 border-[#A3B18A] hover:border-[#3A7D44] text-[#344E41] font-bold py-3 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-sm hover:bg-[#3A7D44]/5"
                   >
                     <Icon name="business-svgrepo-com" size={20} color="white" />
-                    Admin Dashboard
+                    <span className="relative">Dashboard</span>
                   </button>
                 )}
               </div>
@@ -151,13 +238,16 @@ export default function StartPage() {
               <div className="grid grid-cols-3 gap-3 pt-6 border-t border-[#A3B18A]00/50">
                 {[
                   { label: "Skills", value: "AI-Verified", icon: "check-circle-svgrepo-com", color: "#10B981" },
-                  { label: "Time", value: "30 Seconds", icon: "7x24h-svgrepo-com", color: "#F59E0B" },
+                  { label: "Time", value: "30 Seconds", icon: "movie-svgrepo-com", color: "#F59E0B" },
                   { label: "Jobs", value: "Instant Match", icon: "trending-up-svgrepo-com", color: "#8B5CF6" }
                 ].map((stat, i) => (
-                  <div key={i} className="text-center p-3 rounded-md bg-white/30 border border-[#A3B18A]00/50 hover:border-slate-600/80 transition-all">
-                    <Icon name={stat.icon} size={24} color={stat.color} className="mb-2 mx-auto" />
-                    <p className="text-xl font-bold text-[#344E41]">{stat.value}</p>
-                    <p className="text-xs text-[#344E41]/6000 mt-1">{stat.label}</p>
+                  <div
+                    key={i}
+                    className="text-center p-4 rounded-2xl aspect-square flex flex-col items-center justify-center gap-1 bg-white/40 dark:bg-gray-800/40 border border-[#A3B18A]/40 dark:border-gray-700 hover:-translate-y-0.5 hover:border-[#3A7D44]/60 transition"
+                  >
+                    <Icon name={stat.icon} size={22} color={stat.color} className="mb-1" />
+                    <p className="text-base font-semibold text-[#344E41] dark:text-gray-100">{stat.value}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-[#344E41]/6000 dark:text-gray-400">{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -171,54 +261,110 @@ export default function StartPage() {
                 <div className="absolute -inset-1 bg-gradient-to-r from-[#3A7D44] to-[#A3B18A]600 to-slate-600 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-300 animate-pulse" />
                 
                 {/* Card */}
-                <div className="relative bg-white/50 backdrop-blur-xl rounded-2xl p-12 border border-[#A3B18A]00/50">
+                <div className="relative bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-2xl p-12 border border-[#A3B18A]00/50 dark:border-gray-700">
                   <div className="relative w-48 h-48">
                     <Icon name="creativity-svgrepo-com" size={320} color="#EC4899" className="w-full h-full" />
                   </div>
 
                   {/* Animated accent elements */}
                   <div className="absolute top-6 right-6 w-3 h-3 bg-[#3A7D44]00 rounded-full animate-pulse" />
-                  <div className="absolute bottom-6 left-6 w-2 h-2 bg-slate-400 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
+                  <div className="absolute bottom-6 left-6 w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
                   <div className="absolute top-1/2 -right-6 w-2 h-2 bg-[#3A7D44]300 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Why Choose Praxis */}
-          <div className="grid md:grid-cols-3 gap-4 mt-14 pt-8 border-t border-[#A3B18A]00/50">
-            {[
-              { 
-                icon: "check-circle-svgrepo-com",
-                title: "Verified Skills",
-                desc: "AI-powered analysis ensures authenticity",
-                color: "#10B981",
-                bgClass: "bg-emerald-500/20"
-              },
-              {
-                icon: "accelerate-svgrepo-com",
-                title: "Instant Results",
-                desc: "Get credentials immediately",
-                color: "#F59E0B",
-                bgClass: "bg-amber-500/20"
-              },
-              {
-                icon: "trophy-svgrepo-com",
-                title: "Land Jobs",
-                desc: "Direct opportunities from employers",
-                color: "#8B5CF6",
-                bgClass: "bg-violet-500/20"
-              }
-            ].map((item, i) => (
-              <div key={i} className={`group relative p-4 rounded-lg ${item.bgClass} border border-[#A3B18A]00/50 hover:border-[#A3B18A]500/50 transition-all duration-300 hover:bg-slate-700/50`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-[#3A7D44] to-[#A3B18A]500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
-                <div className="relative">
-                  <Icon name={item.icon} size={32} color={item.color} className="mb-4" />
-                  <p className="font-bold text-[#344E41] mb-2">{item.title}</p>
-                  <p className="text-sm text-[#344E41]/6000">{item.desc}</p>
-                </div>
+          {/* Narrative Content Sections */}
+          <div className="mt-16 space-y-16">
+            {/* How It Works */}
+            <section>
+              <div className="max-w-2xl mb-8">
+                <p className="uppercase tracking-[0.2em] text-xs text-[#3A7D44] dark:text-[#A3B18A] font-semibold">Journey</p>
+                <h2 className="text-3xl font-extrabold text-[#344E41] dark:text-gray-100 mt-2">How Praxis Works from hello to hired</h2>
+                <p className="text-sm text-[#344E41]/7000 dark:text-gray-300 mt-3">
+                  The Praxis flow was co-designed with trade workers, training institutes, and recruiters across Dhaka, Khulna, and Chattogram.
+                </p>
               </div>
-            ))}
+              <div className="grid gap-4 md:grid-cols-2">
+                {howItWorks.map((item) => (
+                  <div key={item.step} className="p-5 rounded-2xl bg-white/50 dark:bg-gray-800/50 border border-[#A3B18A]/40 dark:border-gray-700 shadow-sm hover:shadow-lg transition-shadow">
+                    <p className="text-xs font-semibold tracking-[0.3em] text-[#A3B18A] dark:text-[#3A7D44]">STEP {item.step}</p>
+                    <h3 className="text-xl font-bold text-[#344E41] dark:text-gray-100 mt-2">{item.title}</h3>
+                    <p className="text-sm text-[#344E41]/8000 dark:text-gray-300 mt-3">{item.summary}</p>
+                    <p className="text-sm text-[#344E41]/7000 dark:text-gray-400 mt-2 leading-relaxed">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Personas */}
+            <section>
+              <div className="max-w-2xl mb-8">
+                <p className="uppercase tracking-[0.2em] text-xs text-[#3A7D44] dark:text-[#A3B18A] font-semibold">Who it empowers</p>
+                <h2 className="text-3xl font-extrabold text-[#344E41] dark:text-gray-100 mt-2">Built for people proving their craft and teams seeking evidence</h2>
+                <p className="text-sm text-[#344E41]/7000 dark:text-gray-300 mt-3">
+                  Workers document tacit knowledge that rarely fits standard CV templates, while employers see the context behind every achievement before the first interview.
+                </p>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                {personaHighlights.map((persona) => (
+                  <div key={persona.title} className="p-6 rounded-2xl bg-[#F7F9F4] dark:bg-gray-800/70 border border-[#A3B18A]/40 dark:border-gray-700">
+                    <h3 className="text-2xl font-semibold text-[#344E41] dark:text-gray-100">{persona.title}</h3>
+                    <p className="text-sm text-[#344E41]/8000 dark:text-gray-300 mt-3 leading-relaxed">{persona.intro}</p>
+                    <ul className="mt-4 space-y-2">
+                      {persona.bullets.map((bullet) => (
+                        <li key={bullet} className="flex gap-2 text-sm text-[#344E41]/7000 dark:text-gray-400">
+                          <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[#3A7D44] dark:bg-[#A3B18A]" />
+                          <span>{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Success Stories */}
+            <section>
+              <div className="max-w-2xl mb-8">
+                <p className="uppercase tracking-[0.2em] text-xs text-[#3A7D44] dark:text-[#A3B18A] font-semibold">Field notes</p>
+                <h2 className="text-3xl font-extrabold text-[#344E41] dark:text-gray-100 mt-2">Stories from workers and program leads</h2>
+                <p className="text-sm text-[#344E41]/7000 dark:text-gray-300 mt-3">
+                  Praxis deployments already support maker spaces, vocational schools, and fast-growing supply chains. Their feedback keeps us honest and inspires every product iteration.
+                </p>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                {successStories.map((story) => (
+                  <article key={story.person} className="p-5 rounded-2xl bg-white/70 dark:bg-gray-800/70 border border-[#A3B18A]/30 dark:border-gray-700 flex flex-col">
+                    <p className="text-sm text-[#344E41]/8000 dark:text-gray-300 leading-relaxed flex-1">&ldquo;{story.quote}&rdquo;</p>
+                    <div className="mt-4 pt-4 border-t border-[#A3B18A]/30 dark:border-gray-700">
+                      <p className="text-sm font-semibold text-[#344E41] dark:text-gray-100">{story.person}</p>
+                      <p className="text-xs text-[#344E41]/6000 dark:text-gray-400">{story.meta}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            {/* FAQs */}
+            <section>
+              <div className="max-w-2xl mb-8">
+                <p className="uppercase tracking-[0.2em] text-xs text-[#3A7D44] dark:text-[#A3B18A] font-semibold">Questions we hear often</p>
+                <h2 className="text-3xl font-extrabold text-[#344E41] dark:text-gray-100 mt-2">Everything you need to know before recording</h2>
+                <p className="text-sm text-[#344E41]/7000 dark:text-gray-300 mt-3">
+                  Still curious about data ownership, language flexibility, or integrations? These answers come directly from community recording drives and employer onboarding calls.
+                </p>
+              </div>
+              <div className="space-y-4">
+                {faqs.map((faq) => (
+                  <div key={faq.question} className="p-5 rounded-2xl border border-[#A3B18A]/30 dark:border-gray-700 bg-white/60 dark:bg-gray-800/60">
+                    <h3 className="text-lg font-semibold text-[#344E41] dark:text-gray-100">{faq.question}</h3>
+                    <p className="text-sm text-[#344E41]/8000 dark:text-gray-300 mt-2 leading-relaxed">{faq.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
           </div>
         </div>
       </div>
