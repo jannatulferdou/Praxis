@@ -8,6 +8,21 @@ import {
   JobsResponse,
 } from "@/types/api";
 
+/** Safely extract an error message from any HTTP response (JSON or plain text). */
+async function extractError(res: Response, fallback: string): Promise<string> {
+  try {
+    const ct = res.headers.get("content-type") ?? "";
+    if (ct.includes("application/json")) {
+      const body = await res.json();
+      return body.detail || body.message || body.error || fallback;
+    }
+    const text = (await res.text()).trim();
+    return text.slice(0, 300) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 class ApiService {
   /**
    * Upload video to backend → Gemini extracts skills + transcript
@@ -25,8 +40,7 @@ class ApiService {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Upload failed");
+        throw new Error(await extractError(response, "Upload failed"));
       }
 
       return await response.json();
@@ -52,8 +66,7 @@ class ApiService {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Image upload failed");
+        throw new Error(await extractError(response, "Image upload failed"));
       }
 
       return await response.json();
@@ -75,8 +88,7 @@ class ApiService {
       );
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Status check failed");
+        throw new Error(await extractError(response, "Status check failed"));
       }
 
       return await response.json();
@@ -97,8 +109,7 @@ class ApiService {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Skills fetch failed");
+        throw new Error(await extractError(response, "Skills fetch failed"));
       }
 
       return await response.json();
@@ -119,8 +130,7 @@ class ApiService {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Jobs fetch failed");
+        throw new Error(await extractError(response, "Jobs fetch failed"));
       }
 
       return await response.json();
