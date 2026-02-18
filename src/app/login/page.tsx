@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-const ADMIN_PHONE = "01785904899";
 
 const COUNTRIES = [
   { code: "+93", name: "Afghanistan", flag: "🇦🇫" },
@@ -158,7 +156,13 @@ const COUNTRIES = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [phone, setPhone] = useState("");
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(t);
+  }, []);
   const [countryCode, setCountryCode] = useState("+880");
   const [searchQuery, setSearchQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -177,23 +181,6 @@ export default function LoginPage() {
       (cleanPhone.length === 11 && cleanPhone.startsWith("01")) ||
       (cleanPhone.length === 13 && cleanPhone.startsWith("880"))
     );
-  };
-
-  const isAdminPhone = (phoneNumber: string): boolean => {
-    const cleanPhone = phoneNumber.replace(/\D/g, "");
-    const cleanAdmin = ADMIN_PHONE.replace(/\D/g, "");
-    
-    let userPhone11 = cleanPhone;
-    if (cleanPhone.length === 13 && cleanPhone.startsWith("880")) {
-      userPhone11 = cleanPhone.substring(2);
-    }
-    
-    let adminPhone11 = cleanAdmin;
-    if (cleanAdmin.length === 13 && cleanAdmin.startsWith("880")) {
-      adminPhone11 = cleanAdmin.substring(2);
-    }
-    
-    return userPhone11 === adminPhone11;
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,10 +202,6 @@ export default function LoginPage() {
       const userId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       localStorage.setItem("userId", userId);
       localStorage.setItem("userPhone", phone);
-      
-      if (isAdminPhone(phone)) {
-        localStorage.setItem("isAdmin", "true");
-      }
 
       setTimeout(() => {
         router.push("/start");
@@ -249,8 +232,28 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 overflow-hidden relative">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 dark:bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 dark:bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/20 dark:bg-[#3A7D44]/10 rounded-full blur-3xl" style={{ animation: "float 6s ease-in-out infinite" }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/10 dark:bg-[#A3B18A]/5 rounded-full blur-3xl" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#3A7D44]/5 rounded-full blur-3xl" style={{ animation: "pulse-slow 10s ease-in-out infinite" }} />
+        {/* Floating particles */}
+        {[...Array(18)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-[#3A7D44] dark:bg-[#A3B18A]"
+            style={{
+              width: `${(i % 4) + 2}px`,
+              height: `${(i % 4) + 2}px`,
+              top: `${(i * 17 + 5) % 90}%`,
+              left: `${(i * 23 + 3) % 95}%`,
+              opacity: 0.15 + (i % 5) * 0.07,
+              animation: `drift ${5 + (i % 5)}s ease-in-out infinite ${i * 0.4}s`,
+            }}
+          />
+        ))}
+        {/* Floating rings */}
+        <div className="absolute top-20 left-16 w-24 h-24 border border-[#3A7D44]/15 dark:border-[#A3B18A]/10 rounded-full" style={{ animation: "spin-slow 20s linear infinite" }} />
+        <div className="absolute bottom-32 right-20 w-16 h-16 border border-[#A3B18A]/20 dark:border-[#3A7D44]/10 rounded-full" style={{ animation: "spin-slow 15s linear infinite reverse" }} />
+        <div className="absolute top-1/3 right-1/4 w-8 h-8 border border-[#3A7D44]/20 rounded-full" style={{ animation: "spin-slow 12s linear infinite" }} />
       </div>
 
       {/* Grid background pattern */}
@@ -269,7 +272,13 @@ export default function LoginPage() {
         <div className="w-full max-w-4xl">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Section - Form */}
-            <div className="w-full max-w-md mx-auto lg:mx-0">
+            <div
+              className="w-full max-w-md mx-auto lg:mx-0"
+              style={{
+                animation: mounted ? "slideInLeft 0.7s cubic-bezier(0.16,1,0.3,1) both" : "none",
+                opacity: mounted ? undefined : 0,
+              }}
+            >
           {/* Header */}
           <div className="text-center mb-6">
             <div className="flex justify-center mb-4">
@@ -467,16 +476,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Info */}
-          <div className="bg-[#A3B18A]/10 dark:bg-gray-800/50 border border-[#A3B18A]00/50 dark:border-gray-700 rounded-lg p-4 backdrop-blur-sm">
-            <div className="flex gap-3 items-start">
-              <Icon name="notify-svgrepo-com" size={20} color="#3a7d44" className="flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-[#3A7D44]200 dark:text-gray-300">
-                <span className="font-semibold">Demo:</span> Use <code className="bg-[#3A7D44]500/30 dark:bg-gray-700 px-2 py-1 rounded text-[#3A7D44]100 dark:text-gray-200 font-mono text-xs border border-[#A3B18A]00/50 dark:border-gray-600">01785904899</code> for admin access
-              </p>
-            </div>
-          </div>
-
           <div className="mt-8 space-y-5">
             <div className="bg-white/40 dark:bg-gray-800/40 border border-[#A3B18A]/40 dark:border-gray-700 rounded-2xl p-5 shadow-sm">
               <h2 className="text-lg font-semibold text-[#344E41] dark:text-gray-100">What you unlock after signing in</h2>
@@ -514,7 +513,13 @@ export default function LoginPage() {
         </div>
 
         {/* Right Section - Visual */}
-        <div className="hidden lg:flex flex-col items-center justify-center relative gap-8">
+        <div
+          className="hidden lg:flex flex-col items-center justify-center relative gap-8"
+          style={{
+            animation: mounted ? "slideInRight 0.7s cubic-bezier(0.16,1,0.3,1) both 0.1s" : "none",
+            opacity: mounted ? undefined : 0,
+          }}
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-[#3A7D44] to-[#A3B18A]500/20 to-slate-600/20 rounded-3xl blur-3xl" />
           <div className="relative group w-80 h-80">
             <div className="absolute -inset-1 bg-gradient-to-r from-[#3A7D44] to-[#A3B18A]600 to-slate-600 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-300 animate-pulse" />
@@ -530,7 +535,10 @@ export default function LoginPage() {
               { icon: "shield-empty-svgrepo-com", text: "Data Protected", color: "#8B5CF6" },
               { icon: "accelerate-svgrepo-com", text: "Fast Access", color: "#F59E0B" }
             ].map((badge, i) => (
-              <div key={i} className="flex items-center gap-3 bg-white/30 dark:bg-gray-800/30 p-4 rounded-lg border border-[#A3B18A]00/50 dark:border-gray-700 hover:border-slate-600/80 dark:hover:border-gray-600 transition-all">
+              <div
+                key={i}
+                className="flex items-center gap-3 bg-white/30 dark:bg-gray-800/30 p-4 rounded-lg border border-[#A3B18A]00/50 dark:border-gray-700 hover:border-slate-600/80 dark:hover:border-gray-600 transition-all"
+              >
                 <Icon name={badge.icon} size={24} color={badge.color} />
                 <span className="text-white dark:text-gray-100 font-semibold text-sm">{badge.text}</span>
               </div>
@@ -546,6 +554,35 @@ export default function LoginPage() {
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(30px); }
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-40px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(40px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes popIn {
+          from { opacity: 0; transform: scale(0.6); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes drift {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          33%  { transform: translateY(-12px) translateX(6px); }
+          66%  { transform: translateY(8px) translateX(-4px); }
+        }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.04; transform: scale(1); }
+          50%  { opacity: 0.08; transform: scale(1.1); }
         }
       `}</style>
     </div>

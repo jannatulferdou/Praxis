@@ -211,7 +211,7 @@ export default function UploadPage() {
               }`}
             >
               <Icon
-                name={mode === "video" ? "movie-svgrepo-com" : "document-svgrepo-com"}
+                name={mode === "video" ? "upload-svgrepo-com" : "arrow-circle-right-svgrepo-com"}
                 size={18}
                 color={mediaMode === mode ? "white" : "#3A7D44"}
               />
@@ -239,7 +239,7 @@ export default function UploadPage() {
               className="border-2 border-dashed border-[#A3B18A]/50 dark:border-gray-600 rounded-xl p-10 text-center bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm cursor-pointer hover:border-[#3A7D44] hover:bg-[#3A7D44]/5 transition-all duration-200"
             >
               <Icon
-                name={isVideo ? "movie-svgrepo-com" : "document-svgrepo-com"}
+                name={isVideo ? "upload-svgrepo-com" : "arrow-circle-right-svgrepo-com"}
                 size={52}
                 color="#3A7D44"
                 className="mx-auto mb-4"

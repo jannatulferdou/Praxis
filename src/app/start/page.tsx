@@ -7,13 +7,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function StartPage() {
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     setIsLoggedIn(!!userId);
-    setIsAdmin(localStorage.getItem("isAdmin") === "true");
   }, []);
 
   const handleStartRecording = () => {
@@ -25,16 +23,10 @@ export default function StartPage() {
     router.push("/record");
   };
 
-  const handleAdminDashboard = () => {
-    router.push("/admin");
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("userPhone");
-    localStorage.removeItem("isAdmin");
     setIsLoggedIn(false);
-    setIsAdmin(false);
   };
 
   const howItWorks = [
@@ -151,14 +143,6 @@ export default function StartPage() {
             <ThemeToggle />
             {isLoggedIn ? (
               <>
-                {isAdmin && (
-                  <button
-                    onClick={handleAdminDashboard}
-                    className="px-4 py-2 text-[#3A7D44] hover:text-[#2D5F34] font-semibold text-sm transition-colors"
-                  >
-                    Admin
-                  </button>
-                )}
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/50 text-red-700 rounded-lg font-semibold text-sm transition-all"
@@ -187,7 +171,7 @@ export default function StartPage() {
       </div>
 
       {/* Content */}
-      <div className="relative flex items-center justify-center min-h-screen px-4 py-4 pt-16">
+      <div className="relative flex items-center justify-center min-h-screen px-4 py-4 pt-28">
         <div className="w-full max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Section - Text */}
@@ -223,22 +207,13 @@ export default function StartPage() {
                   <span className="relative">Upload</span>
                 </button>
 
-                {isAdmin && (
-                  <button
-                    onClick={handleAdminDashboard}
-                    className="group w-full border-2 border-[#A3B18A] hover:border-[#3A7D44] text-[#344E41] font-bold py-3 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-sm hover:bg-[#3A7D44]/5"
-                  >
-                    <Icon name="business-svgrepo-com" size={20} color="white" />
-                    <span className="relative">Dashboard</span>
-                  </button>
-                )}
               </div>
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-3 pt-6 border-t border-[#A3B18A]00/50">
                 {[
                   { label: "Skills", value: "AI-Verified", icon: "check-circle-svgrepo-com", color: "#10B981" },
-                  { label: "Time", value: "30 Seconds", icon: "movie-svgrepo-com", color: "#F59E0B" },
+                  { label: "Time", value: "30 Seconds", icon: "accelerate-svgrepo-com", color: "#F59E0B" },
                   { label: "Jobs", value: "Instant Match", icon: "trending-up-svgrepo-com", color: "#8B5CF6" }
                 ].map((stat, i) => (
                   <div

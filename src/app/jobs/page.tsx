@@ -44,7 +44,7 @@ export default function JobsPage() {
       skills: ["UI/UX Design", "JavaScript"],
       description: "Create beautiful and functional user interfaces",
       type: "Full-time",
-      icon: "screen-share-svgrepo-com",
+      icon: "trending-up-svgrepo-com",
       color: "#8B5CF6"
     },
     {

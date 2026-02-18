@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -156,7 +156,13 @@ const COUNTRIES = [
 
 export default function SignupPage() {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [phone, setPhone] = useState("");
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(t);
+  }, []);
   const [countryCode, setCountryCode] = useState("+880");
   const [searchQuery, setSearchQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -216,8 +222,28 @@ export default function SignupPage() {
     <div className="min-h-screen bg-[#F7F9F4] dark:bg-gray-900 overflow-hidden relative">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/10 dark:bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 6s ease-in-out infinite" }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/5 dark:bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#A3B18A]/20 dark:bg-[#3A7D44]/10 rounded-full blur-3xl" style={{ animation: "float 6s ease-in-out infinite" }} />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#3A7D44]/10 dark:bg-[#A3B18A]/5 rounded-full blur-3xl" style={{ animation: "float 8s ease-in-out infinite 1s" }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#3A7D44]/5 rounded-full blur-3xl" style={{ animation: "pulse-slow 10s ease-in-out infinite" }} />
+        {/* Floating particles */}
+        {[...Array(18)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full bg-[#3A7D44] dark:bg-[#A3B18A]"
+            style={{
+              width: `${(i % 4) + 2}px`,
+              height: `${(i % 4) + 2}px`,
+              top: `${(i * 19 + 7) % 90}%`,
+              left: `${(i * 21 + 5) % 95}%`,
+              opacity: 0.12 + (i % 5) * 0.07,
+              animation: `drift ${5 + (i % 5)}s ease-in-out infinite ${i * 0.35}s`,
+            }}
+          />
+        ))}
+        {/* Floating rings */}
+        <div className="absolute top-20 right-16 w-24 h-24 border border-[#3A7D44]/15 dark:border-[#A3B18A]/10 rounded-full" style={{ animation: "spin-slow 18s linear infinite" }} />
+        <div className="absolute bottom-28 left-20 w-16 h-16 border border-[#A3B18A]/20 dark:border-[#3A7D44]/10 rounded-full" style={{ animation: "spin-slow 14s linear infinite reverse" }} />
+        <div className="absolute top-2/3 right-1/3 w-10 h-10 border border-[#3A7D44]/20 rounded-full" style={{ animation: "spin-slow 11s linear infinite" }} />
       </div>
 
       {/* Grid background pattern */}
@@ -236,7 +262,12 @@ export default function SignupPage() {
         <div className="w-full max-w-4xl">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Section - Form */}
-            <div>
+            <div
+              style={{
+                animation: mounted ? "slideInLeft 0.7s cubic-bezier(0.16,1,0.3,1) both" : "none",
+                opacity: mounted ? undefined : 0,
+              }}
+            >
               <div className="mb-6">
                 <div className="flex items-center gap-3 mb-3">
                   <Icon name="business-svgrepo-com" size={36} color="#3A7D44" />
@@ -451,7 +482,13 @@ export default function SignupPage() {
             </div>
 
             {/* Right Section - Visual */}
-            <div className="hidden lg:flex flex-col items-center justify-start relative gap-6 pt-0">
+            <div
+              className="hidden lg:flex flex-col items-center justify-start relative gap-6 pt-0"
+              style={{
+                animation: mounted ? "slideInRight 0.7s cubic-bezier(0.16,1,0.3,1) both 0.1s" : "none",
+                opacity: mounted ? undefined : 0,
+              }}
+            >
               <div className="absolute inset-0 bg-gradient-to-br from-[#3A7D44] to-[#A3B18A]500/20 to-slate-600/20 rounded-3xl blur-3xl" />
               <div className="relative group w-80 h-80 -mt-16">
                 <div className="absolute -inset-1 bg-gradient-to-r from-[#3A7D44] to-[#A3B18A]600 to-slate-600 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-300 animate-pulse" />
@@ -467,7 +504,10 @@ export default function SignupPage() {
                   { num: "2", text: "Create Account", icon: "check-circle-svgrepo-com", color: "#10B981" },
                   { num: "3", text: "Record Video", icon: "tree-svgrepo-com(4)", color: "#F59E0B" }
                 ].map((step, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-lg bg-white/30 dark:bg-gray-800/30 border border-[#A3B18A]00/50 dark:border-gray-700 hover:border-slate-600/80 dark:hover:border-gray-600 transition-all group/step">
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 p-4 rounded-lg bg-white/30 dark:bg-gray-800/30 border border-[#A3B18A]00/50 dark:border-gray-700 hover:border-slate-600/80 dark:hover:border-gray-600 transition-all group/step"
+                  >
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#3A7D44]500/30 dark:bg-blue-500/30 flex items-center justify-center font-bold text-[#3A7D44]00 dark:text-blue-300 group-hover/step:bg-[#3A7D44]500/50 dark:group-hover/step:bg-blue-500/50 transition-all">
                       {step.num}
                     </div>
@@ -488,6 +528,35 @@ export default function SignupPage() {
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(30px); }
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-40px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(40px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes popIn {
+          from { opacity: 0; transform: scale(0.6); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes drift {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          33%  { transform: translateY(-12px) translateX(6px); }
+          66%  { transform: translateY(8px) translateX(-4px); }
+        }
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.04; transform: scale(1); }
+          50%  { opacity: 0.08; transform: scale(1.1); }
         }
       `}</style>
     </div>
