@@ -26,7 +26,7 @@ export default function SkillsPage() {
       name: "UI/UX Design",
       confidence: 85,
       category: "Design",
-      icon: "screen-share-svgrepo-com",
+      icon: "trending-up-svgrepo-com",
       color: "#8B5CF6"
     },
     {
@@ -94,10 +94,10 @@ export default function SkillsPage() {
         {/* Overall Score */}
         <div className="grid md:grid-cols-3 gap-3 mb-6">
           <div className="bg-[#A3B18A]/10 dark:bg-gray-800/50 backdrop-blur-xl rounded-lg p-4 border border-[#A3B18A]00/50 dark:border-gray-700">
-            <p className="text-sm text-[#3A7D44]200 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2">
+            <div className="text-sm text-[#3A7D44]200 dark:text-gray-300 font-semibold mb-2 flex items-center gap-2">
               <Icon name="trophy-svgrepo-com" size={18} color="#3A7D44" />
               Overall Score
-            </p>
+            </div>
             <div className="flex items-center gap-4">
               <div className="relative w-20 h-20">
                 <svg className="w-full h-full" viewBox="0 0 200 200">
@@ -126,19 +126,19 @@ export default function SkillsPage() {
           </div>
 
           <div className="bg-emerald-500/20 dark:bg-emerald-900/30 border border-emerald-400/50 dark:border-emerald-700 rounded-lg p-6 backdrop-blur-xl">
-            <p className="text-sm text-emerald-200 dark:text-emerald-300 font-semibold mb-3 flex items-center gap-2">
+            <div className="text-sm text-emerald-200 dark:text-emerald-300 font-semibold mb-3 flex items-center gap-2">
               <Icon name="check-circle-svgrepo-com" size={18} color="#10B981" />
               Verified
-            </p>
+            </div>
             <p className="text-3xl font-bold text-emerald-300 dark:text-emerald-400">{skills.length}</p>
             <p className="text-sm text-emerald-200 dark:text-emerald-300 mt-1">Skills identified</p>
           </div>
 
           <div className="bg-violet-500/20 dark:bg-violet-900/30 border border-violet-400/50 dark:border-violet-700 rounded-lg p-6 backdrop-blur-xl">
-            <p className="text-sm text-violet-200 dark:text-violet-300 font-semibold mb-3 flex items-center gap-2">
+            <div className="text-sm text-violet-200 dark:text-violet-300 font-semibold mb-3 flex items-center gap-2">
               <Icon name="column-chart-svgrepo-com" size={18} color="#8B5CF6" />
               Categories
-            </p>
+            </div>
             <p className="text-3xl font-bold text-violet-300 dark:text-violet-400">{categories.length}</p>
             <p className="text-sm text-violet-200 dark:text-violet-300 mt-1">Skill areas</p>
           </div>

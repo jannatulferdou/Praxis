@@ -7,13 +7,11 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function StartPage() {
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     setIsLoggedIn(!!userId);
-    setIsAdmin(localStorage.getItem("isAdmin") === "true");
   }, []);
 
   const handleStartRecording = () => {
@@ -25,16 +23,10 @@ export default function StartPage() {
     router.push("/record");
   };
 
-  const handleAdminDashboard = () => {
-    router.push("/admin");
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("userPhone");
-    localStorage.removeItem("isAdmin");
     setIsLoggedIn(false);
-    setIsAdmin(false);
   };
 
   const howItWorks = [
@@ -151,14 +143,6 @@ export default function StartPage() {
             <ThemeToggle />
             {isLoggedIn ? (
               <>
-                {isAdmin && (
-                  <button
-                    onClick={handleAdminDashboard}
-                    className="px-4 py-2 text-[#3A7D44] hover:text-[#2D5F34] font-semibold text-sm transition-colors"
-                  >
-                    Admin
-                  </button>
-                )}
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-400/50 text-red-700 rounded-lg font-semibold text-sm transition-all"
@@ -187,7 +171,7 @@ export default function StartPage() {
       </div>
 
       {/* Content */}
-      <div className="relative flex items-center justify-center min-h-screen px-4 py-4 pt-16">
+      <div className="relative flex items-center justify-center min-h-screen px-4 py-4 pt-28">
         <div className="w-full max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left Section - Text */}
@@ -223,22 +207,13 @@ export default function StartPage() {
                   <span className="relative">Upload</span>
                 </button>
 
-                {isAdmin && (
-                  <button
-                    onClick={handleAdminDashboard}
-                    className="group w-full border-2 border-[#A3B18A] hover:border-[#3A7D44] text-[#344E41] font-bold py-3 px-8 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-sm hover:bg-[#3A7D44]/5"
-                  >
-                    <Icon name="business-svgrepo-com" size={20} color="white" />
-                    <span className="relative">Dashboard</span>
-                  </button>
-                )}
               </div>
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-3 pt-6 border-t border-[#A3B18A]00/50">
                 {[
                   { label: "Skills", value: "AI-Verified", icon: "check-circle-svgrepo-com", color: "#10B981" },
-                  { label: "Time", value: "30 Seconds", icon: "movie-svgrepo-com", color: "#F59E0B" },
+                  { label: "Time", value: "30 Seconds", icon: "accelerate-svgrepo-com", color: "#F59E0B" },
                   { label: "Jobs", value: "Instant Match", icon: "trending-up-svgrepo-com", color: "#8B5CF6" }
                 ].map((stat, i) => (
                   <div
@@ -254,23 +229,67 @@ export default function StartPage() {
             </div>
 
             {/* Right Section - Visual */}
-            <div className="hidden lg:flex items-center justify-center relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#3A7D44] to-[#A3B18A]500/20 to-slate-600/20 rounded-3xl blur-3xl" />
-              <div className="relative group">
-                {/* Rotating border */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#3A7D44] to-[#A3B18A]600 to-slate-600 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-all duration-300 animate-pulse" />
-                
-                {/* Card */}
-                <div className="relative bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-2xl p-12 border border-[#A3B18A]00/50 dark:border-gray-700">
-                  <div className="relative w-48 h-48">
-                    <Icon name="creativity-svgrepo-com" size={320} color="#EC4899" className="w-full h-full" />
-                  </div>
+            <div className="flex items-center justify-center relative py-8 lg:py-0">
+              {/* Ambient glow backdrop */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#3A7D44]/20 via-[#A3B18A]/10 to-emerald-400/10 rounded-3xl blur-3xl animate-pulse" />
 
-                  {/* Animated accent elements */}
-                  <div className="absolute top-6 right-6 w-3 h-3 bg-[#3A7D44]00 rounded-full animate-pulse" />
-                  <div className="absolute bottom-6 left-6 w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
-                  <div className="absolute top-1/2 -right-6 w-2 h-2 bg-[#3A7D44]300 rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
+              <div className="relative flex items-center justify-center w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96">
+
+                {/* Outermost slow-spin dashed ring */}
+                <div className="absolute inset-0 rounded-full border border-dashed border-[#3A7D44]/20 animate-[spin_20s_linear_infinite]" />
+
+                {/* Outer orbit ring with dots */}
+                <div className="absolute inset-4 rounded-full border border-[#A3B18A]/30 animate-[spin_14s_linear_infinite_reverse]">
+                  <span className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#3A7D44] shadow-[0_0_10px_#3A7D44] animate-pulse" />
+                  <span className="absolute top-1/2 -right-2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#A3B18A] shadow-[0_0_8px_#A3B18A] animate-pulse" style={{ animationDelay: "0.5s" }} />
+                  <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" style={{ animationDelay: "1s" }} />
                 </div>
+
+                {/* Middle orbit ring */}
+                <div className="absolute inset-10 rounded-full border border-[#3A7D44]/25 animate-[spin_9s_linear_infinite]">
+                  <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#EC4899] shadow-[0_0_10px_#EC4899]" />
+                  <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#F59E0B] shadow-[0_0_8px_#F59E0B]" />
+                </div>
+
+                {/* Gradient conic spinning arc */}
+                <div
+                  className="absolute inset-16 rounded-full animate-[spin_5s_linear_infinite]"
+                  style={{
+                    background: "conic-gradient(from 0deg, transparent 70%, #3A7D44 100%)",
+                    mask: "radial-gradient(farthest-side, transparent calc(100% - 2px), white calc(100% - 2px))",
+                    WebkitMask: "radial-gradient(farthest-side, transparent calc(100% - 2px), white calc(100% - 2px))",
+                  }}
+                />
+
+                {/* Inner pulsing glow */}
+                <div className="absolute inset-20 rounded-full bg-gradient-to-br from-[#3A7D44]/20 to-[#A3B18A]/10 blur-md animate-pulse" />
+
+                {/* Card holding the icon */}
+                <div className="relative z-10 bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-6 sm:p-8 lg:p-10 border border-[#A3B18A]/50 dark:border-gray-700 shadow-2xl animate-[float_6s_ease-in-out_infinite]">
+                  {/* Rotating gradient border glow behind card */}
+                  <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-[#3A7D44] via-[#A3B18A] to-emerald-400 opacity-50 blur-sm animate-[spin_6s_linear_infinite]" style={{ zIndex: -1 }} />
+
+                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 animate-[svgBob_4s_ease-in-out_infinite]">
+                    <Icon name="creativity-svgrepo-com" size={160} color="#EC4899" className="w-full h-full drop-shadow-lg" />
+                    <div className="absolute inset-0 rounded-full bg-[#EC4899]/10 blur-xl animate-pulse" />
+                  </div>
+                </div>
+
+                {/* Floating spark particles */}
+                {[
+                  { top: "8%",  left: "18%", delay: "0s",   size: "w-2 h-2",     color: "bg-[#3A7D44]"  },
+                  { top: "15%", left: "75%", delay: "0.8s", size: "w-1.5 h-1.5", color: "bg-[#A3B18A]"  },
+                  { top: "70%", left: "10%", delay: "1.4s", size: "w-2 h-2",     color: "bg-emerald-400" },
+                  { top: "80%", left: "78%", delay: "0.4s", size: "w-1.5 h-1.5", color: "bg-[#EC4899]"  },
+                  { top: "50%", left: "5%",  delay: "2s",   size: "w-1 h-1",     color: "bg-[#F59E0B]"  },
+                  { top: "30%", left: "88%", delay: "1s",   size: "w-1.5 h-1.5", color: "bg-sky-400"    },
+                ].map((p, i) => (
+                  <span
+                    key={i}
+                    className={`absolute ${p.size} rounded-full ${p.color} opacity-80 animate-[sparkle_3s_ease-in-out_infinite]`}
+                    style={{ top: p.top, left: p.left, animationDelay: p.delay }}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -373,7 +392,15 @@ export default function StartPage() {
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(30px); }
+          50%       { transform: translateY(-18px); }
+        }
+        @keyframes svgBob {
+          0%, 100% { transform: scale(1) rotate(-2deg); }
+          50%       { transform: scale(1.06) rotate(2deg); }
+        }
+        @keyframes sparkle {
+          0%, 100% { opacity: 0.2; transform: scale(0.8) translateY(0px); }
+          50%       { opacity: 1;   transform: scale(1.4) translateY(-8px); }
         }
       `}</style>
     </div>

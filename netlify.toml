@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Allow up to 50 MB request bodies for file uploads
+[functions]
+  node_bundler = "esbuild"
+
+[functions."___netlify-server-handler"]
+  included_files = ["node_modules/@google/generative-ai/**"]
